@@ -1,5 +1,7 @@
 ### x-ui修改版一键脚本（xray内核）
 
+### 与[vaxilu](https://github.com/vaxilu/x-ui)版本相比，支持vless的VISION流控、shadowsocks2022、trojan的WS传输协议
+
 ### 支持纯IPV4、纯IPV6的VPS直接安装，主流linux系统均支持
 
 ### 相关说明及注意点请查看[博客说明](https://ygkkk.blogspot.com)
