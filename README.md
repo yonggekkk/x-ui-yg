@@ -2,7 +2,7 @@
 
 ### 支持纯IPV4、纯IPV6的VPS直接安装，主流linux系统均支持
 
-### 相关说明及注意点请查看[博客说明](https://ygkkk.blogspot.com/2022/02/githubx-uitgacmex-uiipv4ipv6v4v6vpsvaxi.html)
+### 相关说明及注意点请查看[博客说明](https://ygkkk.blogspot.com/2023/03/warp-wireguard-chatgpt.html)
 
 ### 一键脚本：
 ```
