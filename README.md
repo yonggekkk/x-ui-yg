@@ -9,6 +9,8 @@
 wget -N https://gitlab.com/rwkgyg/x-ui-yg/raw/main/install.sh && bash install.sh
 ```
 
+![ce8002bc4949ddb34786a749ce58b81](https://user-images.githubusercontent.com/121604513/236723333-fb657028-b985-4157-afd1-c92843764d1d.png)
+
 ### 脚本源码备份[Gitlab地址](https://gitlab.com/rwkgyg/x-ui-yg)
 ### 参考项目[vaxilu](https://github.com/vaxilu/x-ui)，[FranzKafkaYu](https://github.com/FranzKafkaYu/x-ui)，[MHSanaei](https://github.com/MHSanaei/3x-ui)，[qist](https://github.com/qist/xray-ui)
 
