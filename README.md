@@ -4,6 +4,8 @@
 
 ### 相关说明及注意点请查看[博客说明](https://ygkkk.blogspot.com/2023/05/reality-xui-chatgpt.html)
 
+### [更新日志及配置](https://ygkkk.blogspot.com/2022/02/githubx-uitgacmex-uiipv4ipv6v4v6vpsvaxi.html)
+
 ### 一键脚本：
 ```
 wget -N https://gitlab.com/rwkgyg/x-ui-yg/raw/main/install.sh && bash install.sh
