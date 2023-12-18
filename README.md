@@ -26,6 +26,6 @@ bash <(curl -Ls https://gitlab.com/rwkgyg/x-ui-yg/raw/main/install.sh)
 ---------------------------------------
 #### 声明：
 
-#### 该项目使用base64加密且闭源，介意者请勿使用
+#### 该项目使用base64加密且闭源，介意者请勿使用，[加密原因在此](https://ygkkk.blogspot.com/2022/06/github.html)
 
 #### 所有代码来源于Github社区与ChatGPT的整合；如您需要开源代码，请提Issues留下您的联系邮箱
