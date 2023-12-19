@@ -1,6 +1,8 @@
 ## 大更新预告：2023年底。。下个版本将集成argo隧道。。。
 
-### x-ui精简修改版一键脚本，设置操作近可能与原作者[vaxilu](https://github.com/vaxilu/x-ui)保持一致，针对个人用户做到简单、易用
+### x-ui精简修改版一键脚本，面板中的相关设置近可能与原作者[vaxilu](https://github.com/vaxilu/x-ui)保持一致
+
+### 主要针对个人用户使用，做到简单、无脑、易用
 
 ### 支持纯IPV4、纯IPV6的VPS直接安装，主流linux系统均支持
 
