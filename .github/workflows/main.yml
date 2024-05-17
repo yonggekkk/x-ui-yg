@@ -16,6 +16,6 @@ jobs:
         uses: pixta-dev/repository-mirroring-action@v1.1.1
         with:
           target_repo_url:
-            git@gitlab.com:rwkgyg/x-ui-yg.git
+            git@gitlab.com:rwkgyg/1.git
           ssh_private_key:
             ${{ secrets.private_key }}
