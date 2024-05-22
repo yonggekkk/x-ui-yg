@@ -288,7 +288,7 @@ yellow "二、在 /etc/x-ui-yg 路径导出备份文件x-ui-yg.db"
 readp "确定升级，请按回车(退出请按ctrl+c):" ins
 if [[ -z $ins ]]; then
 systemctl stop x-ui
-rm /usr/local/x-ui/ -rf
+#rm /usr/local/x-ui/ -rf
 serinstall && sleep 2
 restart
 #curl -sL https://gitlab.com/rwkgyg/x-ui-yg/-/raw/main/version/version | awk -F "更新内容" '{print $1}' | head -n 1 > /usr/local/x-ui/v
