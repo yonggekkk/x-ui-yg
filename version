@@ -1,5 +1,8 @@
 2024.5.22 v3.5更新内容：
 脚本地址更改为github地址：bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh)
+
+注意：本次更新时，请输入新脚本地址，选择6进行更新
+
 1：支持多节点聚合订阅、sing-box订阅、clash-meta订阅的配置输出
 2：相关选项菜单及文字修正；依赖更新
 博客教程详见：https://ygkkk.blogspot.com/2023/05/reality-xui-chatgpt.html
