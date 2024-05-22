@@ -29,12 +29,15 @@ elif cat /proc/version | grep -q -E -i "ubuntu"; then
 release="Ubuntu"
 elif cat /proc/version | grep -q -E -i "centos|red hat|redhat"; then
 release="Centos"
+elif cat /etc/issue | grep -q -E -i "alpine"; then
+release="alpine"
 else 
 red "不支持当前的系统，请选择使用Ubuntu,Debian,Centos系统。" && exit
 fi
 vsid=$(grep -i version_id /etc/os-release | cut -d \" -f2 | cut -d . -f1)
 op=$(cat /etc/redhat-release 2>/dev/null || cat /etc/os-release 2>/dev/null | grep -i pretty_name | cut -d \" -f2)
-if [[ $(echo "$op" | grep -i -E "arch|alpine") ]]; then
+#if [[ $(echo "$op" | grep -i -E "arch|alpine") ]]; then
+if [[ $(echo "$op" | grep -i -E "arch") ]]; then
 red "脚本不支持当前的 $op 系统，请选择使用Ubuntu,Debian,Centos系统。" && exit
 fi
 version=$(uname -r | cut -d "-" -f1)
