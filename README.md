@@ -1,10 +1,6 @@
-## 新版准备更新中。。。。。。。。
-
 ### x-ui精简修改版一键脚本，面板中的相关设置近可能与原作者[vaxilu](https://github.com/vaxilu/x-ui)保持一致
 
-### 主要针对个人用户使用，做到简单、无脑、易用
-
-### 支持纯IPV4、纯IPV6的VPS直接安装，主流linux系统均支持
+### 主要针对个人用户使用，做到简单、无脑、易用；支持纯IPV4、纯IPV6、AMD、ARM的VPS直接安装
 
 ### 相关说明及注意点请查看[博客说明](https://ygkkk.blogspot.com/2023/05/reality-xui-chatgpt.html)
 ### 一键脚本：
@@ -15,6 +11,11 @@ bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install
 ```
 bash <(wget -qO- https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh)
 ```
+-----------------------------------------------------
+### x-ui-yg脚本界面预览图（注：相关参数随意填写，仅供围观）
+
+![179ce8b1d5f7b0327dbc8de45f9bdcc](https://github.com/yonggekkk/x-ui-yg/assets/121604513/e28f0beb-efc3-41c1-895e-e39dc8863a37)
+
 -----------------------------------------------------
 ### 交流平台：[甬哥博客地址](https://ygkkk.blogspot.com)、[甬哥YouTube频道](https://www.youtube.com/@ygkkk)、[甬哥TG电报群组](https://t.me/+jZHc6-A-1QQ5ZGVl)、[甬哥TG电报频道](https://t.me/+DkC9ZZUgEFQzMTZl)
 -----------------------------------------------------
