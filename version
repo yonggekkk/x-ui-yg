@@ -1,8 +1,7 @@
-2024.5.22 v3.5更新内容：
+2024.5.23 v3.5更新内容：
 脚本地址更改为github地址：bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh)
 
 注意！！！本次更新退出脚本，然后输入以上新脚本地址，直接选择6进行更新
 
-1：支持多节点聚合订阅、sing-box订阅、clash-meta订阅的配置输出
-2：相关选项菜单及文字修正；依赖更新；Xray默认内核更新为1.8.12
+1：Xray默认内核更新为1.8.13
 博客教程详见：https://ygkkk.blogspot.com/2023/05/reality-xui-chatgpt.html
