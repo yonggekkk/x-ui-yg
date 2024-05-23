@@ -10,7 +10,7 @@
 
 [x-ui搭建xray协议脚本大更新（二）：集成Argo固定隧道、临时隧道](https://youtu.be/NCPCHAi8pzs)
 
-[x-ui搭建xray协议脚本大更新（三）：支持多协议聚合订阅，自动生成Clash-meta、Sing-box配置文件](https://youtu.be/UlQm6c0UQ4U))
+[x-ui搭建xray协议脚本大更新（三）：支持多协议聚合订阅，自动生成Clash-meta、Sing-box配置文件](https://youtu.be/UlQm6c0UQ4U)
 
 
 ### 一键脚本：
