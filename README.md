@@ -1,3 +1,5 @@
+## 下版更新教程将在2024.6中旬发布。。。
+
 ### x-ui精简修改版一键脚本，面板中的相关设置近可能与原作者[vaxilu](https://github.com/vaxilu/x-ui)保持一致
 
 ### 支持纯IPV4、纯IPV6、AMD64、ARM64的VPS直接安装，推荐使用最新的Ubuntu系统
