@@ -39,4 +39,6 @@ bash <(wget -qO- https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/instal
 ---------------------------------------
 #### 声明：
 
-#### 所有代码来源于Github社区与ChatGPT的整合，二进制文件未开源，如您需要二进制开源代码，请提Issues留下您的联系邮箱
+#### 所有代码来源于Github社区与ChatGPT的整合
+
+#### 二进制文件未开源，如您需要二进制开源代码，请提Issues留下您的联系邮箱
