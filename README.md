@@ -37,4 +37,6 @@ bash <(wget -qO- https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/instal
 ### 参考项目[vaxilu](https://github.com/vaxilu/x-ui)，[MHSanaei](https://github.com/MHSanaei/3x-ui)，[qist](https://github.com/qist/xray-ui)
 
 ---------------------------------------
-#### 声明：所有代码来源于Github社区，并通过ChatGPT进行整合
+#### 声明：
+
+#### 所有代码来源于Github社区与ChatGPT的整合，二进制文件未开源，如您需要二进制开源代码，请提Issues留下您的联系邮箱
