@@ -347,6 +347,10 @@ rm /etc/systemd/system/x-ui.service -f
 systemctl daemon-reload
 systemctl reset-failed
 fi
+if [[ -n $(ps -e | grep cloudflared) ]]; then
+kill -15 $(cat /usr/local/x-ui/xuiargopid.log 2>/dev/null) >/dev/null 2>&1
+kill -15 $(cat /usr/local/x-ui/xuiargoympid.log 2>/dev/null) >/dev/null 2>&1
+fi
 rm /usr/bin/x-ui -f
 rm /etc/x-ui-yg/ -rf
 rm /usr/local/x-ui/ -rf
