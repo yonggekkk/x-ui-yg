@@ -778,14 +778,14 @@ kill -15 $(cat /usr/local/x-ui/xuiargoympid.log 2>/dev/null) >/dev/null 2>&1
 fi
 echo
 if [[ -n "${argotoken}" && -n "${argoym}" ]]; then
-nohup setsid /usr/local/x-ui/cloudflared tunnel --edge-ip-version auto run --token ${argotoken} --no-autoupdate >/dev/null 2>&1 & echo "$!" > /usr/local/x-ui/xuiargoympid.log
+nohup setsid /usr/local/x-ui/cloudflared tunnel --no-autoupdate --edge-ip-version auto run --token ${argotoken} >/dev/null 2>&1 & echo "$!" > /usr/local/x-ui/xuiargoympid.log
 sleep 20
 fi
 echo ${argoym} > /usr/local/x-ui/xuiargoym.log
 echo ${argotoken} > /usr/local/x-ui/xuiargotoken.log
 crontab -l > /tmp/crontab.tmp
 sed -i '/xuiargoympid/d' /tmp/crontab.tmp
-echo '@reboot /bin/bash -c "nohup setsid /usr/local/x-ui/cloudflared tunnel --edge-ip-version auto run --token $(cat /usr/local/x-ui/xuiargotoken.log 2>/dev/null) --no-autoupdate >/dev/null 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargoympid.log"' >> /tmp/crontab.tmp
+echo '@reboot /bin/bash -c "nohup setsid /usr/local/x-ui/cloudflared tunnel --no-autoupdate --edge-ip-version auto run --token $(cat /usr/local/x-ui/xuiargotoken.log 2>/dev/null) >/dev/null 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargoympid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
 argo=$(cat /usr/local/x-ui/xuiargoym.log 2>/dev/null)
