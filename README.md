@@ -7,8 +7,6 @@
 
 ### 视频教程：
 
-[纯IPV6的vps利用CDN方式登陆x-ui面版详细教程](https://youtu.be/yEhUq2CwRMk)
-
 [x-ui搭建xray协议脚本大更新（一）：reality协议三模式，数据重置、备份、恢复详细操作](https://youtu.be/xlvKnjQoF7c)
 
 [x-ui搭建xray协议脚本大更新（二）：集成Argo固定隧道、临时隧道](https://youtu.be/NCPCHAi8pzs)
