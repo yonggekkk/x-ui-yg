@@ -1,7 +1,8 @@
-2024.5.23 v3.5更新内容：
+2024.6.21 v3.6更新内容：
 脚本地址更改为github地址：bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh)
-
-注意！！！本次更新退出脚本，然后输入以上新脚本地址，直接选择6进行更新
-
-1：Xray默认内核更新为1.8.13
+更新日志：
+1：Xray默认内核更新为1.8.16
+2：支持Alpine操作系统
+3：升级相关依赖，相关文字描述的更新
+可直接更新，配置文件已备份在https://github.com/yonggekkk/x-ui-yg/blob/main/config.json，可自行替换
 博客教程详见：https://ygkkk.blogspot.com/2023/05/reality-xui-chatgpt.html
