@@ -413,7 +413,11 @@ fi
 }
 
 show_log() {
+if [[ x"${release}" == x"alpine" ]]; then
+yellow "暂不支持alpine查看日志"
+else
 journalctl -u x-ui.service -e --no-pager -f
+fi
 }
 
 get_char(){
