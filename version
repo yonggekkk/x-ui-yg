@@ -2,6 +2,7 @@
 更新日志：
 1：Xray默认内核更新为1.8.16
 2：支持Alpine操作系统
-3：修复相关BUG，升级相关依赖，更新相关文字描述
+3：支持splithttp传输协议
+4：修复相关BUG，升级相关依赖，更新相关文字描述
 可直接更新，配置文件已备份在https://github.com/yonggekkk/x-ui-yg/blob/main/config.json，可自行替换
 博客教程详见：https://ygkkk.blogspot.com/2023/05/reality-xui-chatgpt.html
