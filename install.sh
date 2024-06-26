@@ -60,7 +60,8 @@ if [ ! -f xuiyg_update ]; then
 green "首次安装x-ui-yg脚本必要的依赖……"
 if [[ x"${release}" == x"alpine" ]]; then
 apk update
-apk add wget curl tar jq tzdata openssl expect git socat iproute2 virt-what
+apk add wget curl tar jq tzdata openssl expect git socat iproute2
+apk virt-what
 else
 if [[ $release = Centos && ${vsid} =~ 8 ]]; then
 cd /etc/yum.repos.d/ && mkdir backup && mv *repo backup/ 
