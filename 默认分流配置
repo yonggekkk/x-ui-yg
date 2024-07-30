@@ -42,7 +42,7 @@
 "tag": "direct",
 "protocol": "freedom",
 "settings": {
-"domainStrategy":"UseIPv6v4"
+"domainStrategy":"UseIP"
 }
 },
 {
