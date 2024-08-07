@@ -156,8 +156,8 @@ fi
 serinstall(){
 green "下载并安装x-ui相关组件……"
 cd /usr/local/
-#curl -sSL -o /usr/local/x-ui-linux-${cpu}.tar.gz --insecure https://gitlab.com/rwkgyg/x-ui-yg/raw/main/x-ui-linux-${cpu}.tar.gz
-curl -sSL -o /usr/local/x-ui-linux-${cpu}.tar.gz --insecure https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/x-ui-linux-${cpu}.tar.gz
+#curl -L -o /usr/local/x-ui-linux-${cpu}.tar.gz --insecure https://gitlab.com/rwkgyg/x-ui-yg/raw/main/x-ui-linux-${cpu}.tar.gz
+curl -L -o /usr/local/x-ui-linux-${cpu}.tar.gz -# --retry 2 --insecure https://raw.githubusercontent.com/yonggekkk/x-ui-yg/ex/x-ui-linux-${cpu}.tar.gz
 tar zxvf x-ui-linux-${cpu}.tar.gz > /dev/null 2>&1
 rm x-ui-linux-${cpu}.tar.gz -f
 cd x-ui
@@ -167,8 +167,8 @@ systemctl daemon-reload >/dev/null 2>&1
 systemctl enable x-ui >/dev/null 2>&1
 systemctl start x-ui >/dev/null 2>&1
 cd
-#curl -sSL -o /usr/bin/x-ui --insecure https://gitlab.com/rwkgyg/x-ui-yg/raw/main/1install.sh >/dev/null 2>&1
-curl -sSL -o /usr/bin/x-ui --insecure https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh >/dev/null 2>&1
+#curl -L -o /usr/bin/x-ui --insecure https://gitlab.com/rwkgyg/x-ui-yg/raw/main/1install.sh >/dev/null 2>&1
+curl -L -o /usr/bin/x-ui -# --retry 2 --insecure https://raw.githubusercontent.com/yonggekkk/x-ui-yg/ex/install.sh
 chmod +x /usr/bin/x-ui
 if [[ x"${release}" == x"alpine" ]]; then
 echo '#!/sbin/openrc-run
@@ -261,6 +261,17 @@ sleep 1
 green "x-ui登录端口：${port}"
 }
 
+pathinstall(){
+echo
+readp "设置x-ui登录路径（回车跳过为随机3位字符）：" path
+sleep 1
+if [[ -z $path ]]; then
+path=`date +%s%N |md5sum | cut -c 1-3`
+fi
+/usr/local/x-ui/x-ui setting -webBasePath ${path} >/dev/null 2>&1
+green "x-ui登录路径：${path}"
+}
+
 resinstall(){
 echo "----------------------------------------------------------------------"
 restart
@@ -307,8 +318,9 @@ serinstall
 echo "----------------------------------------------------------------------"
 userinstall
 portinstall
+pathinstall
 resinstall
-[[ -e /etc/gai.conf ]] && grep -qE '^ *precedence ::ffff:0:0/96  100' /etc/gai.conf || echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf 2>/dev/null
+#[[ -e /etc/gai.conf ]] && grep -qE '^ *precedence ::ffff:0:0/96  100' /etc/gai.conf || echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf 2>/dev/null
 }
 
 update() {
@@ -356,7 +368,7 @@ rm /etc/x-ui-yg/ -rf
 rm /usr/local/x-ui/ -rf
 uncronxui
 rm -rf xuiyg_update
-sed -i '/^precedence ::ffff:0:0\/96  100/d' /etc/gai.conf 2>/dev/null
+#sed -i '/^precedence ::ffff:0:0\/96  100/d' /etc/gai.conf 2>/dev/null
 echo
 green "x-ui已卸载完成"
 echo
@@ -371,6 +383,7 @@ reset_config() {
 /usr/local/x-ui/x-ui setting -reset
 sleep 1 
 portinstall
+pathinstall
 }
 
 stop() {
@@ -468,12 +481,14 @@ fi
 
 xuichange(){
 echo
-readp "1. 更改 x-ui 用户名与密码 \n2. 更改 x-ui 面板登录端口 \n3. 重置 x-ui 面板设置（面板设置选项中所有设置都装恢复出厂设置，登录端口将重新自定义，账号密码不变）\n0. 返回主菜单\n请选择：" action
+readp "1. 更改 x-ui 用户名与密码 \n2. 更改 x-ui 面板登录端口\n3. 更改 x-ui 面板根路径\n4. 重置 x-ui 面板设置（面板设置选项中所有设置都恢复出厂设置，登录端口与面板根路径将重新自定义，账号密码不变）\n0. 返回主菜单\n请选择：" action
 if [[ $action == "1" ]]; then
 userinstall && restart
 elif [[ $action == "2" ]]; then
 portinstall && restart
 elif [[ $action == "3" ]]; then
+pathinstall && restart
+elif [[ $action == "4" ]]; then
 reset_config && restart
 else
 show_menu
@@ -2296,7 +2311,7 @@ green " 1. 一键安装 x-ui"
 green " 2. 删除卸载 x-ui"
 echo "----------------------------------------------------------------------------------"
 green " 3. 其他设置 【Argo双隧道、订阅优选IP、Gitlab订阅链接】"
-green " 4. 变更 x-ui 面板设置 【用户名密码、登录端口、还原面板】"
+green " 4. 变更 x-ui 面板设置 【用户名密码、登录端口、根路径、还原面板】"
 green " 5. 关闭、重启 x-ui"
 green " 6. 更新 x-ui 脚本"
 echo "----------------------------------------------------------------------------------"
@@ -2425,6 +2440,7 @@ xpath=$(echo $acp | awk '{print $8}')
 xport=$(echo $acp | awk '{print $6}')
 xip1=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 1p)
 xip2=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 2p)
+#if [ "$xpath" == "" ]; then
 if [ "$xpath" == "/" ]; then
 path="$sred【严重安全提示: 请进入面板设置，添加url根路径】$plain"
 fi
