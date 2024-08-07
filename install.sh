@@ -242,7 +242,7 @@ green "x-ui登录密码：${password}"
 
 portinstall(){
 echo
-readp "设置x-ui登录端口[1-65535]（回车跳过为2000-65535之间的随机端口）：" port
+readp "设置 x-ui 登录端口[1-65535]（回车跳过为2000-65535之间的随机端口）：" port
 sleep 1
 if [[ -z $port ]]; then
 port=$(shuf -i 2000-65535 -n 1)
@@ -263,7 +263,7 @@ green "x-ui登录端口：${port}"
 
 pathinstall(){
 echo
-readp "设置x-ui登录路径（回车跳过为随机3位字符）：" path
+readp "设置 x-ui 登录路径（回车跳过为随机3位字符）：" path
 sleep 1
 if [[ -z $path ]]; then
 path=`date +%s%N |md5sum | cut -c 1-3`
@@ -2440,12 +2440,11 @@ xpath=$(echo $acp | awk '{print $8}')
 xport=$(echo $acp | awk '{print $6}')
 xip1=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 1p)
 xip2=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 2p)
-#if [ "$xpath" == "" ]; then
 if [ "$xpath" == "/" ]; then
-path="$sred【严重安全提示: 请进入面板设置，添加url根路径】$plain"
+pathk="$sred【严重安全提示: 请进入面板设置，添加url根路径】$plain"
 fi
 echo -e "x-ui登录信息如下："
-echo -e "$blue$acp$path$plain" 
+echo -e "$blue$acp$pathk$plain" 
 if [[ -n $xip2 ]]; then
 xuimb="http://${xip1}:${xport}${xpath} 或者 http://${xip2}:${xport}${xpath}"
 else
