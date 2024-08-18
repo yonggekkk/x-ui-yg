@@ -92,8 +92,8 @@ fi
 fi
 fi
 
-packages=("curl" "openssl" "tar" "expect" "wget" "git" "cron")
-inspackages=("curl" "openssl" "tar" "expect" "wget" "git" "cron")
+packages=("curl" "openssl" "tar" "expect" "xxd" "python3" "wget" "git" "cron")
+inspackages=("curl" "openssl" "tar" "expect" "xxd" "python3" "wget" "git" "cron")
 for i in "${!packages[@]}"; do
 package="${packages[$i]}"
 inspackage="${inspackages[$i]}"
@@ -676,19 +676,67 @@ red "输入错误,请重新选择" && openyn
 fi
 }
 
-
 changeserv(){
 echo
-readp "1：设置Argo临时、固定隧道\n2：设置vmess与vless节点在订阅链接中的优选IP地址\n3：设置Gitlab订阅分享链接\n0：返回上层\n请选择【0-3】：" menu
+readp "1：设置Argo临时、固定隧道\n2：设置vmess与vless节点在订阅链接中的优选IP地址\n3：设置Gitlab订阅分享链接\n4：获取warp-wireguard账号配置\n0：返回上层\n请选择【0-3】：" menu
 if [ "$menu" = "1" ];then
 xuiargo
 elif [ "$menu" = "2" ];then
 xuicfadd
 elif [ "$menu" = "3" ];then
 gitlabsub
+elif [ "$menu" = "4" ];then
+warpwg
 else 
 show_menu
 fi
+}
+
+warpwg(){
+warpcode(){
+reg(){
+keypair=$(openssl genpkey -algorithm X25519|openssl pkey -text -noout)
+private_key=$(echo "$keypair" | awk '/priv:/{flag=1; next} /pub:/{flag=0} flag' | tr -d '[:space:]' | xxd -r -p | base64)
+public_key=$(echo "$keypair" | awk '/pub:/{flag=1} flag' | tr -d '[:space:]' | xxd -r -p | base64)
+curl -X POST 'https://api.cloudflareclient.com/v0a2158/reg' -sL --tlsv1.3 \
+-H 'CF-Client-Version: a-7.21-0721' -H 'Content-Type: application/json' \
+-d \
+'{
+"key":"'${public_key}'",
+"tos":"'$(date +"%Y-%m-%dT%H:%M:%S.000Z")'"
+}' \
+| python3 -m json.tool | sed "/\"account_type\"/i\         \"private_key\": \"$private_key\","
+}
+reserved(){
+reserved_str=$(echo "$warp_info" | grep 'client_id' | cut -d\" -f4)
+reserved_hex=$(echo "$reserved_str" | base64 -d | xxd -p)
+reserved_dec=$(echo "$reserved_hex" | fold -w2 | while read HEX; do printf '%d ' "0x${HEX}"; done | awk '{print "["$1", "$2", "$3"]"}')
+echo -e "{\n    \"reserved_dec\": $reserved_dec,"
+echo -e "    \"reserved_hex\": \"0x$reserved_hex\","
+echo -e "    \"reserved_str\": \"$reserved_str\"\n}"
+}
+result() {
+echo "$warp_reserved" | grep -P "reserved" | sed "s/ //g" | sed 's/:"/: "/g' | sed 's/:\[/: \[/g' | sed 's/\([0-9]\+\),\([0-9]\+\),\([0-9]\+\)/\1, \2, \3/' | sed 's/^"/    "/g' | sed 's/"$/",/g'
+echo "$warp_info" | grep -P "(private_key|public_key|\"v4\": \"172.16.0.2\"|\"v6\": \"2)" | sed "s/ //g" | sed 's/:"/: "/g' | sed 's/^"/    "/g'
+echo "}"
+}
+warp_info=$(reg) 
+warp_reserved=$(reserved) 
+result
+}
+output=$(warpcode)
+if ! echo "$output" 2>/dev/null | grep -w "private_key" > /dev/null; then
+v6=2606:4700:110:8f20:f22e:2c8d:d8ee:fe7
+pvk=SGU6hx3CJAWGMr6XYoChvnrKV61hxAw2S4VlgBAxzFs=
+res=[15,242,244]
+else
+pvk=$(echo "$output" | sed -n 4p | awk '{print $2}' | tr -d ' "' | sed 's/.$//')
+v6=$(echo "$output" | sed -n 7p | awk '{print $2}' | tr -d ' "')
+res=$(echo "$output" | sed -n 1p | awk -F":" '{print $NF}' | tr -d ' ' | sed 's/.$//')
+fi
+blue "Private_key私钥：$pvk"
+blue "IPV6地址：$v6"
+blue "reserved值：$res"
 }
 
 cloudflaredargo(){
@@ -2310,7 +2358,7 @@ red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 green " 1. 一键安装 x-ui"
 green " 2. 删除卸载 x-ui"
 echo "----------------------------------------------------------------------------------"
-green " 3. 其他设置 【Argo双隧道、订阅优选IP、Gitlab订阅链接】"
+green " 3. 其他设置 【Argo双隧道、订阅优选IP、Gitlab订阅链接、获取warp-wireguard账号配置】"
 green " 4. 变更 x-ui 面板设置 【用户名密码、登录端口、根路径、还原面板】"
 green " 5. 关闭、重启 x-ui"
 green " 6. 更新 x-ui 脚本"
@@ -2319,7 +2367,7 @@ green " 7. 更新并查看聚合通用节点、clash-meta与sing-box客户端配
 green " 8. 查看 x-ui 运行日志"
 green " 9. 一键原版BBR+FQ加速"
 green "10. 管理 Acme 申请域名证书"
-green "11. 管理 Warp 查看本地Netflix、ChatGPT解锁情况，无限获取warp-wireguard账号配置"
+green "11. 管理 Warp 查看本地Netflix、ChatGPT解锁情况"
 green "12. 刷新当前主菜单参数显示"
 green " 0. 退出脚本"
 red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
