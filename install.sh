@@ -678,7 +678,7 @@ fi
 
 changeserv(){
 echo
-readp "1：设置Argo临时、固定隧道\n2：设置vmess与vless节点在订阅链接中的优选IP地址\n3：设置Gitlab订阅分享链接\n4：获取warp-wireguard账号配置\n0：返回上层\n请选择【0-3】：" menu
+readp "1：设置Argo临时、固定隧道\n2：设置vmess与vless节点在订阅链接中的优选IP地址\n3：设置Gitlab订阅分享链接\n4：获取warp-wireguard普通账号配置\n0：返回上层\n请选择【0-3】：" menu
 if [ "$menu" = "1" ];then
 xuiargo
 elif [ "$menu" = "2" ];then
@@ -734,6 +734,7 @@ pvk=$(echo "$output" | sed -n 4p | awk '{print $2}' | tr -d ' "' | sed 's/.$//')
 v6=$(echo "$output" | sed -n 7p | awk '{print $2}' | tr -d ' "')
 res=$(echo "$output" | sed -n 1p | awk -F":" '{print $NF}' | tr -d ' ' | sed 's/.$//')
 fi
+green "成功生成warp-wireguard普通账号配置，进入x-ui面板-面板设置-Xray配置出站设置，进行三要素替换"
 blue "Private_key私钥：$pvk"
 blue "IPV6地址：$v6"
 blue "reserved值：$res"
