@@ -2387,17 +2387,14 @@ echo -e "Argo路径path：$blue$argopath$plain"
 argolsym=$(cat /usr/local/x-ui/argo.log 2>/dev/null | grep -a trycloudflare.com | awk 'NR==2{print}' | awk -F// '{print $2}' | awk '{print $1}')
 [[ $(echo "$argolsym" | grep -w "api.trycloudflare.com/tunnel") ]] && argolsyms='生成失败，请重置' || argolsyms=$argolsym
 echo -e "Argo临时域名：$blue$argolsyms$plain"
-
 fi
 else
 echo -e "错误反馈：$red面板尚未创建一个端口为$yellow$(cat /usr/local/x-ui/xuiargoport.log 2>/dev/null)$plain$red的ws节点，推荐vmess-ws$plain$plain"
 fi
 fi
-
 if [[ -f /usr/local/x-ui/xuiargoymport.log && -f /usr/local/x-ui/xuiargoport.log ]]; then
 echo "--------------------------"
 fi
-
 if [[ -f /usr/local/x-ui/xuiargoymport.log ]]; then
 argoprotocol=$(jq -r --arg port "$(cat /usr/local/x-ui/xuiargoymport.log 2>/dev/null)" '.inbounds[] | select(.port == ($port | tonumber)) | .protocol' /usr/local/x-ui/bin/config.json)
 echo -e "Argo固定隧道状态：$blue已启动 【监听$yellow${argoprotocol}-ws$plain$blue节点的端口:$plain$yellow$(cat /usr/local/x-ui/xuiargoymport.log 2>/dev/null)$plain$blue】$plain$plain"
