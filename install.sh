@@ -405,6 +405,7 @@ fi
 }
 
 restart() {
+yellow "请稍等……"
 if [[ x"${release}" == x"alpine" ]]; then
 rc-service x-ui restart
 else
