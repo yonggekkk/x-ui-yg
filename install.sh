@@ -2481,7 +2481,7 @@ echo "--------------------------------------------------------------------------
 acp=$(/usr/local/x-ui/x-ui setting -show 2>/dev/null)
 if [[ -n $acp ]]; then
 if [[ $acp == *admin*  ]]; then
-red "x-ui出错，请重置用户名或者卸载重装x-ui"
+red "x-ui出错，请选择4重置用户名密码或者卸载重装x-ui"
 else
 xpath=$(echo $acp | awk '{print $8}')
 xport=$(echo $acp | awk '{print $6}')
