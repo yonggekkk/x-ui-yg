@@ -679,7 +679,7 @@ fi
 
 changeserv(){
 echo
-readp "1：设置Argo临时、固定隧道\n2：设置vmess与vless节点在订阅链接中的优选IP地址\n3：设置Gitlab订阅分享链接\n4：获取warp-wireguard普通账号配置\n0：返回上层\n请选择【0-3】：" menu
+readp "1：设置Argo临时、固定隧道\n2：设置vmess与vless节点在订阅链接中的优选IP地址\n3：设置Gitlab订阅分享链接\n4：获取warp-wireguard普通账号配置\n0：返回上层\n请选择【0-4】：" menu
 if [ "$menu" = "1" ];then
 xuiargo
 elif [ "$menu" = "2" ];then
