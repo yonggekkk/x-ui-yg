@@ -189,14 +189,14 @@
 "type":"field",
 "outboundTag":"socks5-warp-v4",
 "domain":[
-"yg_kkk"
+"ipinfo.io","yg_kkk"
 ]
 },
 {
 "type":"field",
 "outboundTag":"socks5-warp-v6",
 "domain":[
-"yg_kkk"
+"ip.me","yg_kkk"
 ]
 },
 {
