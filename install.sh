@@ -272,11 +272,7 @@ fi
 green "x-ui登录根路径：${path}"
 }
 
-resinstall(){
-echo "----------------------------------------------------------------------"
-restart
-#curl -sL https://gitlab.com/rwkgyg/x-ui-yg/-/raw/main/version/version | awk -F "更新内容" '{print $1}' | head -n 1 > /usr/local/x-ui/v
-curl -sL https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/version | awk -F "更新内容" '{print $1}' | head -n 1 > /usr/local/x-ui/v
+showxuiip(){
 xuilogin(){
 v4v6
 if [[ -z $v4 ]]; then
@@ -300,6 +296,14 @@ systemctl restart warp-go >/dev/null 2>&1
 systemctl enable warp-go >/dev/null 2>&1
 systemctl start warp-go >/dev/null 2>&1
 fi
+}
+
+resinstall(){
+echo "----------------------------------------------------------------------"
+restart
+#curl -sL https://gitlab.com/rwkgyg/x-ui-yg/-/raw/main/version/version | awk -F "更新内容" '{print $1}' | head -n 1 > /usr/local/x-ui/v
+curl -sL https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/version | awk -F "更新内容" '{print $1}' | head -n 1 > /usr/local/x-ui/v
+showxuiip
 sleep 2
 xuigo
 cronxui
@@ -2370,7 +2374,7 @@ green " 8. 查看 x-ui 运行日志"
 green " 9. 一键原版BBR+FQ加速"
 green "10. 管理 Acme 申请域名证书"
 green "11. 管理 Warp 查看本地Netflix、ChatGPT解锁情况"
-green "12. 刷新当前主菜单参数显示"
+green "12. 刷新IP配置及参数显示"
 green " 0. 退出脚本"
 red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
 insV=$(cat /usr/local/x-ui/v 2>/dev/null)
@@ -2521,7 +2525,7 @@ case "$Input" in
  9 ) bbr;;
  10  ) acme;;
  11 ) cfwarp;;
- 12 ) show_menu;;
+ 12 ) showxuiip && show_menu;;
  * ) exit 
 esac
 }
