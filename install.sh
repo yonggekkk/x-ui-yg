@@ -2543,7 +2543,40 @@ echo "--------------------------------------------------------------------------
 if [[ -n $(ps -e | grep xuiwpph) ]]; then
 s5port=$(cat /usr/local/x-ui/xuiwpph.log 2>/dev/null | awk '{print $3}'| awk -F":" '{print $NF}')
 s5gj=$(cat /usr/local/x-ui/xuiwpph.log 2>/dev/null | awk '{print $6}')
-grep -q "country" /usr/local/x-ui/xuiwpph.log 2>/dev/null && s5ms="多地区Psiphon代理模式 (端口:$s5port  国家:$s5gj)" || s5ms="本地Warp代理模式 (端口:$s5port)"
+case "$s5gj" in
+AT) showgj="奥地利" ;;
+AU) showgj="澳大利亚" ;;
+BE) showgj="比利时" ;;
+BG) showgj="保加利亚" ;;
+CA) showgj="加拿大" ;;
+CH) showgj="瑞士" ;;
+CZ) showgj="捷克" ;;
+DE) showgj="德国" ;;
+DK) showgj="丹麦" ;;
+EE) showgj="爱沙尼亚" ;;
+ES) showgj="西班牙" ;;
+FI) showgj="芬兰" ;;
+FR) showgj="法国" ;;
+GB) showgj="英国" ;;
+HR) showgj="克罗地亚" ;;
+HU) showgj="匈牙利" ;;
+IE) showgj="爱尔兰" ;;
+IN) showgj="印度" ;;
+IT) showgj="意大利" ;;
+JP) showgj="日本" ;;
+LV) showgj="拉脱维亚" ;;
+NL) showgj="荷兰" ;;
+NO) showgj="挪威" ;;
+PL) showgj="波兰" ;;
+PT) showgj="葡萄牙" ;;
+RO) showgj="罗马尼亚" ;;
+RS) showgj="塞尔维亚" ;;
+SE) showgj="瑞典" ;;
+SG) showgj="新加坡" ;;
+SK) showgj="斯洛伐克" ;;
+US) showgj="美国" ;;
+esac
+grep -q "country" /usr/local/x-ui/xuiwpph.log 2>/dev/null && s5ms="多地区Psiphon代理模式 (端口:$s5port  国家:$showgj)" || s5ms="本地Warp代理模式 (端口:$s5port)"
 echo -e "WARP-plus-Socks5状态：$blue已启动 $s5ms$plain"
 else
 echo -e "WARP-plus-Socks5状态：$blue未启动$plain"
