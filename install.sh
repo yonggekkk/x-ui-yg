@@ -2397,7 +2397,7 @@ readp "请选择【0-3】：" menu
 if [ "$menu" = "1" ]; then
 ins
 nohup setsid /usr/local/x-ui/xuiwpph -b 127.0.0.1:$port --gool -$sw46 >/dev/null 2>&1 & echo "$!" > /usr/local/x-ui/xuiwpphid.log
-sleep 20
+green "申请IP中……请稍等……" && sleep 20
 resv1=$(curl -s --socks5 localhost:$port icanhazip.com)
 resv2=$(curl -sx socks5h://localhost:$port icanhazip.com)
 if [[ -z $resv1 && -z $resv2 ]]; then
@@ -2448,7 +2448,7 @@ echo '
 '
 readp "可选择国家地区（输入末尾两个大写字母，如美国，则输入US）：" guojia
 nohup setsid /usr/local/x-ui/xuiwpph -b 127.0.0.1:$port --cfon --country $guojia -$sw46 >/dev/null 2>&1 & echo "$!" > /usr/local/x-ui/xuiwpphid.log
-sleep 20
+green "申请IP中……请稍等……" && sleep 20
 resv1=$(curl -s --socks5 localhost:$port icanhazip.com)
 resv2=$(curl -sx socks5h://localhost:$port icanhazip.com)
 if [[ -z $resv1 && -z $resv2 ]]; then
