@@ -35,7 +35,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install
 bash <(wget -qO- https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh)
 ```
 -----------------------------------------------------
-### x-ui-yg脚本界面预览图（注：相关参数随意填写，仅供围观）
+### x-ui-yg脚本菜单界面附加功能全开预览图（注：相关参数随意填写，仅供围观）
 
 ![3b01adef46255df98053a3e49372373](https://github.com/user-attachments/assets/cea4568f-bb19-46b9-a35b-bacc67ac573a)
 
