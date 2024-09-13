@@ -763,9 +763,10 @@ fi
 
 xuiargo(){
 echo
-yellow "开启Argo隧道节点的两个前提要求："
+yellow "开启Argo隧道节点的三个前提要求："
 green "一、节点的传输协议是WS"
 green "二、节点的TLS必须关闭"
+green "三、节点的请求头留空不设"
 green "节点类别可选：vmess-ws、vless-ws、trojan-ws、shadowsocks-ws。推荐vmess-ws"
 echo
 yellow "1：设置Argo临时隧道"
