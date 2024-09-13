@@ -35,7 +35,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/instal
 -----------------------------------------------------
 ### x-ui-yg脚本界面预览图（注：相关参数随意填写，仅供围观）
 
-![179ce8b1d5f7b0327dbc8de45f9bdcc](https://github.com/yonggekkk/x-ui-yg/assets/121604513/e28f0beb-efc3-41c1-895e-e39dc8863a37)
+![3b01adef46255df98053a3e49372373](https://github.com/user-attachments/assets/cea4568f-bb19-46b9-a35b-bacc67ac573a)
 
 -----------------------------------------------------
 ### 交流平台：[甬哥博客地址](https://ygkkk.blogspot.com)、[甬哥YouTube频道](https://www.youtube.com/@ygkkk)、[甬哥TG电报群组](https://t.me/+jZHc6-A-1QQ5ZGVl)、[甬哥TG电报频道](https://t.me/+DkC9ZZUgEFQzMTZl)
