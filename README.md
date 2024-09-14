@@ -21,7 +21,7 @@
 
 [x-ui搭建xray协议大更新（四）：支持Alpine系统；ChatGPT客户端可以随便登录了，多IP分流设置详细说明](https://youtu.be/2G2f64Mm1UU)
 
-[x-ui搭建xray协议大更新（五）：集成oblivion warp免费vpn功能，支持本地WARP+赛风VPN切换分流(30个国家地区IP)](https://youtu.be/Zo65206HBRM)
+[x-ui搭建xray协议大更新（五）：集成oblivion warp免费vpn功能，支持本地WARP+赛风VPN切换分流(30个国家IP)](https://youtu.be/Zo65206HBRM)
 
 -----------------------------------------------------
 ### 交流平台：[甬哥博客地址](https://ygkkk.blogspot.com)、[甬哥YouTube频道](https://www.youtube.com/@ygkkk)、[甬哥TG电报群组](https://t.me/+jZHc6-A-1QQ5ZGVl)、[甬哥TG电报频道](https://t.me/+DkC9ZZUgEFQzMTZl)
