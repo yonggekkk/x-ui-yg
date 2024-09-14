@@ -1,7 +1,7 @@
 
 ### x-ui精简修改版一键脚本，面板中的相关设置近可能与原作者[vaxilu](https://github.com/vaxilu/x-ui)保持一致
 
-### 支持纯IPV4、纯IPV6、AMD64、ARM64的VPS直接安装
+### 支持纯IPV4、纯IPV6、AMD64、ARM64的VPS直接安装，
 
 ### 支持alpine系统，推荐使用最新的Ubuntu系统
 
@@ -13,13 +13,15 @@
 
 ### 视频教程：
 
-[x-ui搭建xray协议脚本大更新（一）：reality协议三模式，数据重置、备份、恢复详细操作](https://youtu.be/xlvKnjQoF7c)
+[x-ui搭建xray协议大更新（一）：reality协议三模式，数据重置、备份、恢复详细操作](https://youtu.be/xlvKnjQoF7c)
 
-[x-ui搭建xray协议脚本大更新（二）：集成Argo固定隧道、临时隧道](https://youtu.be/NCPCHAi8pzs)
+[x-ui搭建xray协议大更新（二）：集成Argo固定隧道、临时隧道](https://youtu.be/NCPCHAi8pzs)
 
-[x-ui搭建xray协议脚本大更新（三）：支持多协议聚合订阅，自动生成Clash-meta、Sing-box配置文件](https://youtu.be/UlQm6c0UQ4U)
+[x-ui搭建xray协议大更新（三）：支持多协议聚合订阅，自动生成Clash-meta、Sing-box配置文件](https://youtu.be/UlQm6c0UQ4U)
 
-[x-ui搭建xray协议脚本大更新（四）：支持Alpine系统；ChatGPT客户端可以随便登录了，多IP分流设置详细说明](https://youtu.be/2G2f64Mm1UU)
+[x-ui搭建xray协议大更新（四）：支持Alpine系统；ChatGPT客户端可以随便登录了，多IP分流设置详细说明](https://youtu.be/2G2f64Mm1UU)
+
+[x-ui搭建xray协议大更新（五）：集成oblivion warp免费vpn功能，支持本地WARP+赛风VPN切换分流(30个国家地区IP)](https://youtu.be/Zo65206HBRM)
 
 -----------------------------------------------------
 ### 交流平台：[甬哥博客地址](https://ygkkk.blogspot.com)、[甬哥YouTube频道](https://www.youtube.com/@ygkkk)、[甬哥TG电报群组](https://t.me/+jZHc6-A-1QQ5ZGVl)、[甬哥TG电报频道](https://t.me/+DkC9ZZUgEFQzMTZl)
