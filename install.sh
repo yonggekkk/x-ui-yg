@@ -1410,7 +1410,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   servername: $vl_name                 
   reality-opts: 
     public-key: $public_key    
-    short-id: '$short_id'                      
+    short-id: $short_id                      
   client-fingerprint: $finger   
 
 EOF
