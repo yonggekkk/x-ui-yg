@@ -2670,9 +2670,11 @@ xuimb="http://${xip1}:${xport}${xpath} 或者 http://${xip2}:${xport}${xpath}"
 else
 xuimb="http://${xip1}:${xport}${xpath}"
 fi
-echo -e "$blue登录地址(裸IP模式-非安全)：$xuimb$plain"
+echo -e "$blue登录地址(裸IP泄露模式-非安全)：$xuimb$plain"
 if [[ -f /root/ygkkkca/ca.log ]]; then
-echo -e "$blue登录地址(域名模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
+echo -e "$blue登录地址(域名加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
+else
+echo -e "$blue强烈建议申请域名证书并开启域名(https)登录方式，以确保面板数据安全$plain"
 fi
 fi
 else
