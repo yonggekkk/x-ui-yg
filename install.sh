@@ -92,8 +92,8 @@ fi
 fi
 fi
 
-packages=("curl" "openssl" "tar" "expect" "xxd" "python3" "wget" "git" "cron")
-inspackages=("curl" "openssl" "tar" "expect" "xxd" "python3" "wget" "git" "cron")
+packages=("curl" "openssl" "tar" "expect" "xxd" "python3" "wget" "git")
+inspackages=("curl" "openssl" "tar" "expect" "xxd" "python3" "wget" "git")
 for i in "${!packages[@]}"; do
 package="${packages[$i]}"
 inspackage="${inspackages[$i]}"
@@ -2671,6 +2671,10 @@ else
 xuimb="http://${xip1}:${xport}${xpath}"
 fi
 echo -e "$blue登录地址(裸IP泄露模式-非安全)：$xuimb$plain"
+if [[ -f /root/ygkkkca/cert.crt && -f /root/ygkkkca/private.key && -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
+ym=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
+echo $ym > /root/ygkkkca/ca.log
+fi
 if [[ -f /root/ygkkkca/ca.log ]]; then
 echo -e "$blue登录地址(域名加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
 else
