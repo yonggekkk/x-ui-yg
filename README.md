@@ -1,5 +1,5 @@
 
-### x-ui精简修改版一键脚本，面板中的相关设置近可能与原作者[vaxilu](https://github.com/vaxilu/x-ui)保持一致
+### x-ui精简修改版一键脚本，面板中的相关设置尽可能与原作者[vaxilu](https://github.com/vaxilu/x-ui)保持一致
 
 ### 支持纯IPV4、纯IPV6、AMD64、ARM64的VPS直接安装
 
