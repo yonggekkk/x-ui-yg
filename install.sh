@@ -1173,14 +1173,6 @@ cat > /usr/local/x-ui/bin/xui_singbox.json <<EOF
       "type": "direct"
     },
     {
-      "tag": "block",
-      "type": "block"
-    },
-    {
-      "tag": "dns-out",
-      "type": "dns"
-    },
-    {
       "tag": "select",
       "type": "selector",
       "default": "auto",
