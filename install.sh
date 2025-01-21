@@ -74,13 +74,13 @@ fi
 
 if [ -x "$(command -v apt-get)" ]; then
 apt update -y
-apt install jq tzdata cron -y
+apt install jq tzdata socat cron -y
 elif [ -x "$(command -v yum)" ]; then
 yum update -y && yum install epel-release -y
-yum install jq tzdata -y
+yum install jq tzdata socat -y
 elif [ -x "$(command -v dnf)" ]; then
 dnf update -y
-dnf install jq tzdata -y
+dnf install jq tzdata socat -y
 fi
 if [ -x "$(command -v yum)" ] || [ -x "$(command -v dnf)" ]; then
 if ! command -v "cronie" &> /dev/null; then
