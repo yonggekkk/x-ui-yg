@@ -74,7 +74,7 @@ fi
 
 if [ -x "$(command -v apt-get)" ]; then
 apt update -y
-apt install jq tzdata -y
+apt install jq tzdata cron -y
 elif [ -x "$(command -v yum)" ]; then
 yum update -y && yum install epel-release -y
 yum install jq tzdata -y
