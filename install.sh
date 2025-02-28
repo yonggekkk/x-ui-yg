@@ -2344,9 +2344,9 @@ sed -i "/^$line$/s/.*/$new_line/g" /usr/local/x-ui/bin/xui_singbox.json
 sed -i '/\/\/_0\|\/\/_1\|\/\/_2/d' /usr/local/x-ui/bin/xui_singbox.json
 sed -i '/#_0\|#_1\|#_2\|#_3/d' /usr/local/x-ui/bin/xui_clashmeta.yaml
 find /usr/local/x-ui/bin -type f -name "*.log" -delete
-url=$(cat /usr/local/x-ui/bin/ty.txt 2>/dev/null)
-baseurl=$(echo -e "$url" | base64 -w 0)
-echo "$baseurl" > /usr/local/x-ui/bin/xui_ty.txt
+baseurl=$(base64 -w 0 < /usr/local/x-ui/bin/ty.txt 2>/dev/null)
+v2sub=$(cat /usr/local/x-ui/bin/ty.txt 2>/dev/null)
+echo "$v2sub" > /usr/local/x-ui/bin/xui_ty.txt
 }
 
 insxuiwpph(){
