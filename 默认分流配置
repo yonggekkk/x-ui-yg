@@ -1,3 +1,4 @@
+
 {
 "api": {
     "services": [
@@ -189,7 +190,7 @@
 "type":"field",
 "outboundTag":"socks5-warp-v4",
 "domain":[
-"ipinfo.io","yg_kkk"
+"db-ip.com","yg_kkk"
 ]
 },
 {
