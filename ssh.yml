@@ -1,0 +1,56 @@
+name: Keep Servers Alive
+on:
+  schedule:
+   - cron: '0 12 */7 * *' # 每7天的12：00执行一次（私库每月500分钟运行时长，每天16分钟）
+  workflow_dispatch: 
+
+jobs:
+  keep_servers_alive:
+    runs-on: ubuntu-latest
+    env:
+      ACCOUNTS: >
+        [
+        { "SSH_USER":"用户名", "SSH_PASS":"密码", "HOST":"登录IP或者域名", "PORT":"端口"}
+        ]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install required packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass curl jq
+
+      - name: Process each account
+        run: |
+          run_remote_command() {
+          local SSH_USER=$1
+          local SSH_PASS=$2
+          local HOST=${3}
+          local PORT=${4}
+          sshpass -p "$SSH_PASS" ssh -p "$PORT" -o StrictHostKeyChecking=no "$SSH_USER@$HOST"
+           }
+                 echo "*****************************************************"
+                 echo "*****************************************************"
+                 echo "甬哥Github项目  ：github.com/yonggekkk"
+                 echo "甬哥Blogger博客 ：ygkkk.blogspot.com"
+                 echo "甬哥YouTube频道 ：www.youtube.com/@ygkkk"
+                 echo "vps服务器远程登录脚本【Github】"
+                 echo "*****************************************************"
+                 echo "*****************************************************"
+              count=0  
+           for account in $(echo "${ACCOUNTS}" | jq -c '.[]'); do
+              count=$((count+1))
+              SSH_USER=$(echo $account | jq -r '.SSH_USER')
+              SSH_PASS=$(echo $account | jq -r '.SSH_PASS')
+              HOST=$(echo $account | jq -r '.HOST')
+              PORT=$(echo $account | jq -r '.PORT')
+          if sshpass -p "$SSH_PASS" ssh -p "$PORT" -o StrictHostKeyChecking=no "$SSH_USER@$HOST" -q exit; then
+            echo "🎉恭喜！✅第【$count】台服务器连接成功！🚀服务器地址：$HOST ，账户名：$SSH_USER" 
+           else
+            echo "===================================================="
+            echo "💥杯具！❌第【$count】台服务器连接失败！🚀服务器地址：$HOST ，账户名：$SSH_USER"
+            echo "⚠️可能账号名、密码、服务器名称、端口输入错误，或者当前服务器在维护中"  
+            echo "===================================================="
+           fi
+            done
