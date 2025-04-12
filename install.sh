@@ -2475,6 +2475,18 @@ show_menu
 fi
 }
 
+sbsm(){
+echo
+green "关注甬哥YouTube频道：https://www.youtube.com/@ygkkk 了解最新代理协议与翻墙动态"
+echo
+blue "x-ui-yg脚本视频教程：https://www.youtube.com/playlist?list=PLMgly2AulGG_Affv6skQXWnVqw7XWiPwJ"
+echo
+blue "x-ui-yg脚本博客说明：https://ygkkk.blogspot.com/2023/05/reality-xui-chatgpt.html"
+echo
+blue "x-ui-yg脚本项目地址：https://github.com/yonggekkk/x-ui-yg"
+echo
+}
+
 show_menu(){
 clear
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"           
@@ -2506,6 +2518,9 @@ green "10. 管理 Acme 申请域名证书"
 green "11. 管理 Warp 查看本地Netflix、ChatGPT解锁情况"
 green "12. 添加WARP-plus-Socks5代理模式 【本地Warp/多地区Psiphon-VPN】"
 green "13. 刷新IP配置及参数显示"
+echo "----------------------------------------------------------------------------------"
+yellow "14. x-ui-yg脚本使用说明书"
+echo "----------------------------------------------------------------------------------"
 green " 0. 退出脚本"
 red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
 insV=$(cat /usr/local/x-ui/v 2>/dev/null)
@@ -2707,6 +2722,7 @@ case "$Input" in
  11 ) cfwarp;;
  12 ) check_install && insxuiwpph;;
  13 ) check_install && showxuiip && show_menu;;
+ 14 ) sbsm;;
  * ) exit 
 esac
 }
