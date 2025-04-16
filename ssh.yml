@@ -28,7 +28,7 @@ jobs:
              echo "甬哥Github项目  ：github.com/yonggekkk"
              echo "甬哥Blogger博客 ：ygkkk.blogspot.com"
              echo "甬哥YouTube频道 ：www.youtube.com/@ygkkk"
-             echo "vps服务器远程登录脚本【Github】"
+             echo "vps服务器远程登录一次SSH脚本【Github】"
              echo "*****************************************************"
              echo "*****************************************************"
               count=0  
