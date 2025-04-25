@@ -49,6 +49,11 @@ bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install
 ![3b01adef46255df98053a3e49372373](https://github.com/user-attachments/assets/cea4568f-bb19-46b9-a35b-bacc67ac573a)
 
 -----------------------------------------------------
+### 微信打赏甬哥侃侃侃ygkkk
+![41440820a366deeb8109db5610313a1](https://github.com/user-attachments/assets/69597ca3-e7a5-44e7-8e5e-6305c7a63933)
+
+-----------------------------------------------------
+
 ### 感谢你右上角的star🌟
 [![Stargazers over time](https://starchart.cc/yonggekkk/x-ui-yg.svg)](https://starchart.cc/yonggekkk/x-ui-yg)
 
