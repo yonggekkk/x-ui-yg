@@ -30,6 +30,8 @@
 
 [x-ui搭建xray协议大更新（五）：集成oblivion warp免费vpn功能，支持本地WARP+赛风VPN切换分流(30个国家IP)](https://youtu.be/Zo65206HBRM)
 
+[x-ui搭建xray协议大更新（六）：Xhttp轻松搞定UDP/TCP/CDN，Xhttp最简单的7个方案，总有一款适合你](https://youtu.be/kY_4AyQh1l0)
+
 -----------------------------------------------------
 ### 交流平台：[甬哥博客地址](https://ygkkk.blogspot.com)、[甬哥YouTube频道](https://www.youtube.com/@ygkkk)、[甬哥TG电报群组](https://t.me/+jZHc6-A-1QQ5ZGVl)、[甬哥TG电报频道](https://t.me/+DkC9ZZUgEFQzMTZl)
 
