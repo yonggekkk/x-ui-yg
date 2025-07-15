@@ -1,4 +1,3 @@
-
 {
 "api": {
     "services": [
@@ -108,7 +107,7 @@
 "0.0.0.0/0",
 "::/0"
 ],
-"endpoint":"162.159.192.1:2408"
+"endpoint":"engage.cloudflareclient.com:2408"
 }
 ],
 "reserved":[197,230,30]
@@ -136,7 +135,7 @@
 }
 ],
 "routing": {
-"domainStrategy": "AsIs",
+"domainStrategy": "IPOnDemand",
 "rules": [
 {
         "inboundTag": [
