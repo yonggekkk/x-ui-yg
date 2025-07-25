@@ -1381,7 +1381,6 @@ cat > /usr/local/x-ui/bin/sb${i}.log <<EOF
       "server": "$xip1",
       "server_port": $vl_port,
       "uuid": "$uuid",
-      "packet_encoding": "xudp",
       "flow": "xtls-rprx-vision",
       "tls": {
         "enabled": true,
