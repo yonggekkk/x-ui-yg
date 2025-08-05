@@ -2477,7 +2477,7 @@ fi
 
 sbsm(){
 echo
-green "关注甬哥YouTube频道：https://www.youtube.com/@ygkkk 了解最新代理协议与翻墙动态"
+green "关注甬哥YouTube频道：https://youtube.com/@ygkkk?sub_confirmation=1 了解最新代理协议与翻墙动态"
 echo
 blue "x-ui-yg脚本视频教程：https://www.youtube.com/playlist?list=PLMgly2AulGG_Affv6skQXWnVqw7XWiPwJ"
 echo
