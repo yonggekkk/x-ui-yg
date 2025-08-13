@@ -64,4 +64,6 @@ bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install
 ---------------------------------------
 #### 声明：
 
-#### 所有代码来源于Github参考项目与ChatGPT的整合，二进制文件未开源，介意者请勿安装使用。
+#### 所有代码来源于Github参考项目与ChatGPT的整合，二进制文件未开源，介意者请勿安装使用
+
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
