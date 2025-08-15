@@ -147,7 +147,7 @@ warpcheck
 if [[ ! $wgcfv4 =~ on|plus && ! $wgcfv6 =~ on|plus ]]; then
 v4=$(curl -s4m5 icanhazip.com -k)
 if [ -z $v4 ]; then
-yellow "检测到 纯IPV6 VPS，添加DNS64"
+yellow "检测到 纯IPV6 VPS，添加nat64"
 echo -e "nameserver 2a00:1098:2b::1\nnameserver 2a00:1098:2c::1" > /etc/resolv.conf
 fi
 fi
