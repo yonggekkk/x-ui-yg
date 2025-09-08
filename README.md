@@ -59,9 +59,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install
 ### 感谢你右上角的star🌟
 [![Stargazers over time](https://starchart.cc/yonggekkk/x-ui-yg.svg)](https://starchart.cc/yonggekkk/x-ui-yg)
 
-### 参考项目[vaxilu](https://github.com/vaxilu/x-ui)，[MHSanaei](https://github.com/MHSanaei/3x-ui)，[qist](https://github.com/qist/xray-ui)，[warpplus](https://github.com/bepass-org/warp-plus)
-
 ---------------------------------------
-#### 声明：
+#### 声明：所有代码来源于Github参考项目与ChatGPT的整合，参考项目[vaxilu](https://github.com/vaxilu/x-ui)，[MHSanaei](https://github.com/MHSanaei/3x-ui)，[qist](https://github.com/qist/xray-ui)，[warpplus](https://github.com/bepass-org/warp-plus)
 
-#### 所有代码来源于Github参考项目与ChatGPT的整合，二进制文件未开源，介意者请勿安装使用
+#### 二进制文件未开源，介意者请勿安装使用 
