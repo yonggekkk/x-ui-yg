@@ -1,6 +1,6 @@
 v25.9.14更新内容：
 更新日志：
-1：支持可选的Vless协议的ENC加密、reality的MLDSA65加密
+1：支持可选的Vless协议的ENC加密、reality的MLDSA65加密（与singbox类客户端不兼容）
 在线升级用户可直接更新！！！
 重置配置文件？已备份在https://github.com/yonggekkk/x-ui-yg/blob/main/config.json
 博客教程详见：https://ygkkk.blogspot.com/2023/05/reality-xui-chatgpt.html
