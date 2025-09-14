@@ -55,7 +55,7 @@ bbr="Openvz版bbr-plus"
 else
 bbr="Openvz/Lxc"
 fi
-
+touch xuiyg_update
 if [ ! -f xuiyg_update ]; then
 green "首次安装x-ui-yg脚本必要的依赖……"
 if [[ x"${release}" == x"alpine" ]]; then
