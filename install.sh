@@ -126,17 +126,16 @@ green "TUN守护功能已启动"
 fi
 fi
 fi
-
 argopid(){
 ym=$(cat /usr/local/x-ui/xuiargoympid.log 2>/dev/null)
 ls=$(cat /usr/local/x-ui/xuiargopid.log 2>/dev/null)
 }
-
 v4v6(){
 v4=$(curl -s4m5 icanhazip.com -k)
 v6=$(curl -s6m5 icanhazip.com -k)
+v4dq=$(curl -s4m5 -k https://ip.fm | sed -E 's/.*Location: ([^,]+,[^,]+,[^,]+),.*/\1/' 2>/dev/null)
+v6dq=$(curl -s6m5 -k https://ip.fm | sed -E 's/.*Location: ([^,]+,[^,]+,[^,]+),.*/\1/' 2>/dev/null)
 }
-
 warpcheck(){
 wgcfv6=$(curl -s6m5 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
 wgcfv4=$(curl -s4m5 https://www.cloudflare.com/cdn-cgi/trace -k | grep warp | cut -d= -f2)
@@ -2552,14 +2551,18 @@ fi
 if [[ -z $v4 ]]; then
 vps_ipv4='无IPV4'      
 vps_ipv6="$v6"
+location="$v6dq"
 elif [[ -n $v4 && -n $v6 ]]; then
 vps_ipv4="$v4"    
 vps_ipv6="$v6"
+location="$v4dq"
 else
 vps_ipv4="$v4"    
 vps_ipv6='无IPV6'
+location="$v4dq"
 fi
 echo -e "本地IPV4地址：$blue$vps_ipv4$w4$plain   本地IPV6地址：$blue$vps_ipv6$w6$plain"
+echo -e "服务器地区：$blue$location$plain"
 echo "------------------------------------------------------------------------------------"
 if [[ -n $(ps -e | grep xuiwpph) ]]; then
 s5port=$(cat /usr/local/x-ui/xuiwpph.log 2>/dev/null | awk '{print $3}'| awk -F":" '{print $NF}')
