@@ -399,7 +399,7 @@ systemctl stop x-ui
 fi
 check_status
 if [[ $? == 1 ]]; then
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/goxui.sh/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
@@ -419,11 +419,11 @@ fi
 sleep 2
 check_status
 if [[ $? == 0 ]]; then
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/goxui.sh/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 echo "* * * * * /usr/local/x-ui/goxui.sh" >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
@@ -632,7 +632,7 @@ chmod +x /usr/local/x-ui/goxui.sh
 
 cronxui(){
 uncronxui
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 echo "* * * * * /usr/local/x-ui/goxui.sh" >> /tmp/crontab.tmp
 echo "0 2 * * * systemctl restart x-ui" >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
@@ -640,7 +640,7 @@ rm /tmp/crontab.tmp
 }
 
 uncronxui(){
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/goxui.sh/d' /tmp/crontab.tmp
 sed -i '/systemctl restart x-ui/d' /tmp/crontab.tmp
 sed -i '/xuiargoport.log/d' /tmp/crontab.tmp
@@ -814,18 +814,18 @@ yellow "1：请确保你输入的端口是x-ui已创建WS协议端口"
 yellow "2：Argo域名验证暂不可用，稍后可能会自动恢复，或者再次重置" && sleep 2
 fi
 done
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiargoport.log/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 echo '@reboot /bin/bash -c "/usr/local/x-ui/cloudflared tunnel --url http://localhost:$(cat /usr/local/x-ui/xuiargoport.log) --edge-ip-version auto --no-autoupdate --protocol http2 > /usr/local/x-ui/argo.log 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargopid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
 elif [ "$menu" = "2" ]; then
 kill -15 $(cat /usr/local/x-ui/xuiargopid.log 2>/dev/null) >/dev/null 2>&1
 rm -rf /usr/local/x-ui/argo.log /usr/local/x-ui/xuiargopid.log /usr/local/x-ui/xuiargoport.log
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiargopid.log/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
@@ -863,7 +863,7 @@ sleep 20
 fi
 echo ${argoym} > /usr/local/x-ui/xuiargoym.log
 echo ${argotoken} > /usr/local/x-ui/xuiargotoken.log
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiargoympid/d' /tmp/crontab.tmp
 echo '@reboot /bin/bash -c "nohup setsid /usr/local/x-ui/cloudflared tunnel --no-autoupdate --edge-ip-version auto --protocol http2 run --token $(cat /usr/local/x-ui/xuiargotoken.log 2>/dev/null) >/dev/null 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargoympid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
@@ -873,7 +873,7 @@ blue "Argo固定隧道设置完成，固定域名：$argo"
 elif [ "$menu" = "2" ]; then
 kill -15 $(cat /usr/local/x-ui/xuiargoympid.log 2>/dev/null) >/dev/null 2>&1
 rm -rf /usr/local/x-ui/xuiargoym.log /usr/local/x-ui/xuiargoymport.log /usr/local/x-ui/xuiargoympid.log /usr/local/x-ui/xuiargotoken.log
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiargoympid/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
@@ -2387,7 +2387,7 @@ fi
 unins(){
 kill -15 $(cat /usr/local/x-ui/xuiwpphid.log 2>/dev/null) >/dev/null 2>&1
 rm -rf /usr/local/x-ui/xuiwpph.log /usr/local/x-ui/xuiwpphid.log
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiwpphid.log/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
 rm /tmp/crontab.tmp
@@ -2408,7 +2408,7 @@ if [[ -z $resv1 && -z $resv2 ]]; then
 red "WARP-plus-Socks5的IP获取失败" && unins && exit
 else
 echo "/usr/local/x-ui/xuiwpph -b 127.0.0.1:$port --gool -$sw46 --endpoint 162.159.192.1:2408 >/dev/null 2>&1" > /usr/local/x-ui/xuiwpph.log
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiwpphid.log/d' /tmp/crontab.tmp
 echo '@reboot /bin/bash -c "nohup setsid $(cat /usr/local/x-ui/xuiwpph.log 2>/dev/null) & pid=\$! && echo \$pid > /usr/local/x-ui/xuiwpphid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
@@ -2460,7 +2460,7 @@ if [[ -z $resv1 && -z $resv2 ]]; then
 red "WARP-plus-Socks5的IP获取失败，尝试换个国家地区吧" && unins && exit
 else
 echo "/usr/local/x-ui/xuiwpph -b 127.0.0.1:$port --cfon --country $guojia -$sw46 --endpoint 162.159.192.1:2408 >/dev/null 2>&1" > /usr/local/x-ui/xuiwpph.log
-crontab -l > /tmp/crontab.tmp
+crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiwpphid.log/d' /tmp/crontab.tmp
 echo '@reboot /bin/bash -c "nohup setsid $(cat /usr/local/x-ui/xuiwpph.log 2>/dev/null) & pid=\$! && echo \$pid > /usr/local/x-ui/xuiwpphid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp
