@@ -819,7 +819,7 @@ sed -i '/xuiargoport.log/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 crontab -l 2>/dev/null > /tmp/crontab.tmp
-echo '@reboot /bin/bash -c "/usr/local/x-ui/cloudflared tunnel --url http://localhost:$(cat /usr/local/x-ui/xuiargoport.log) --edge-ip-version auto --no-autoupdate --protocol http2 > /usr/local/x-ui/argo.log 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargopid.log"' >> /tmp/crontab.tmp
+echo '@reboot sleep 10 && /bin/bash -c "/usr/local/x-ui/cloudflared tunnel --url http://localhost:$(cat /usr/local/x-ui/xuiargoport.log) --edge-ip-version auto --no-autoupdate --protocol http2 > /usr/local/x-ui/argo.log 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargopid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 elif [ "$menu" = "2" ]; then
@@ -865,7 +865,7 @@ echo ${argoym} > /usr/local/x-ui/xuiargoym.log
 echo ${argotoken} > /usr/local/x-ui/xuiargotoken.log
 crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiargoympid/d' /tmp/crontab.tmp
-echo '@reboot /bin/bash -c "nohup setsid /usr/local/x-ui/cloudflared tunnel --no-autoupdate --edge-ip-version auto --protocol http2 run --token $(cat /usr/local/x-ui/xuiargotoken.log 2>/dev/null) >/dev/null 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargoympid.log"' >> /tmp/crontab.tmp
+echo '@reboot sleep 10 && /bin/bash -c "nohup setsid /usr/local/x-ui/cloudflared tunnel --no-autoupdate --edge-ip-version auto --protocol http2 run --token $(cat /usr/local/x-ui/xuiargotoken.log 2>/dev/null) >/dev/null 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargoympid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 argo=$(cat /usr/local/x-ui/xuiargoym.log 2>/dev/null)
@@ -2410,7 +2410,7 @@ else
 echo "/usr/local/x-ui/xuiwpph -b 127.0.0.1:$port --gool -$sw46 --endpoint 162.159.192.1:2408 >/dev/null 2>&1" > /usr/local/x-ui/xuiwpph.log
 crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiwpphid.log/d' /tmp/crontab.tmp
-echo '@reboot /bin/bash -c "nohup setsid $(cat /usr/local/x-ui/xuiwpph.log 2>/dev/null) & pid=\$! && echo \$pid > /usr/local/x-ui/xuiwpphid.log"' >> /tmp/crontab.tmp
+echo '@reboot sleep 10 && /bin/bash -c "nohup setsid $(cat /usr/local/x-ui/xuiwpph.log 2>/dev/null) & pid=\$! && echo \$pid > /usr/local/x-ui/xuiwpphid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 green "WARP-plus-Socks5的IP获取成功，可进行Socks5代理分流"
@@ -2462,7 +2462,7 @@ else
 echo "/usr/local/x-ui/xuiwpph -b 127.0.0.1:$port --cfon --country $guojia -$sw46 --endpoint 162.159.192.1:2408 >/dev/null 2>&1" > /usr/local/x-ui/xuiwpph.log
 crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiwpphid.log/d' /tmp/crontab.tmp
-echo '@reboot /bin/bash -c "nohup setsid $(cat /usr/local/x-ui/xuiwpph.log 2>/dev/null) & pid=\$! && echo \$pid > /usr/local/x-ui/xuiwpphid.log"' >> /tmp/crontab.tmp
+echo '@reboot sleep 10 && /bin/bash -c "nohup setsid $(cat /usr/local/x-ui/xuiwpph.log 2>/dev/null) & pid=\$! && echo \$pid > /usr/local/x-ui/xuiwpphid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 green "WARP-plus-Socks5的IP获取成功，可进行Socks5代理分流"
