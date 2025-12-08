@@ -5,6 +5,8 @@
 
 ### 支持alpine系统，推荐使用最新的Ubuntu系统
 
+### Docker版本[https://github.com/ShaoG-R/x-ui-yg-docker](https://github.com/ShaoG-R/x-ui-yg-docker)———由[ShaoG-R](https://github.com/ShaoG-R)维护
+
 ### 本项目订阅节点为本地化生成，不使用节点转换等第三方外链引用，无需担心节点订阅被外链作者查看
 
 -----------------------------------------------
@@ -45,10 +47,6 @@ bash <(wget -qO- https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/instal
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh)
 ```
-
-### Docker 版本
-[https://github.com/ShaoG-R/x-ui-yg-docker](https://github.com/ShaoG-R/x-ui-yg-docker)　　　　　　　　———由[ShaoG-R](https://github.com/ShaoG-R)维护
-
 
 -----------------------------------------------------
 ### x-ui-yg脚本菜单界面附加功能全开预览图（注：相关参数随意填写，仅供围观）
