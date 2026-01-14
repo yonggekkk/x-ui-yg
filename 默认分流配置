@@ -175,42 +175,42 @@
 "type":"field",
 "outboundTag":"xray-wg-warp-v4",
 "domain":[
-"ifconfig.co","yg_kkk"
+"ifconfig.co","yg-kkk.com"
 ]
 },
 {
 "type":"field",
 "outboundTag":"xray-wg-warp-v6",
 "domain":[
-"ipget.net","yg_kkk"
+"ipget.net","yg-kkk.com"
 ]
 },
 {
 "type":"field",
 "outboundTag":"socks5-warp-v4",
 "domain":[
-"db-ip.com","yg_kkk"
+"db-ip.com","yg-kkk.com"
 ]
 },
 {
 "type":"field",
 "outboundTag":"socks5-warp-v6",
 "domain":[
-"ip.me","yg_kkk"
+"ip.me","yg-kkk.com"
 ]
 },
 {
 "type": "field",
 "outboundTag":"vps-outbound-v4",
 "domain": [
-"api.myip.com","yg_kkk"
+"api.myip.com","yg-kkk.com"
 ]
 },
 {
 "type": "field",
 "outboundTag":"vps-outbound-v6",
 "domain": [
-"api64.ipify.org","yg_kkk"
+"api64.ipify.org","yg-kkk.com"
 ]
 },
 {
