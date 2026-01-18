@@ -22,6 +22,10 @@
 
 ### 视频教程：
 
+[🥇搭建代理9大问题排行榜：第4名全网99%的人被误导！第1名每个人都被折腾到爆！](https://youtu.be/pJwJBqBkcfw)
+
+[🥇2025年度代理协议"拉到夯"综合排名](https://youtu.be/IoFtykGXDao)
+
 [x-ui搭建xray协议大更新（一）：reality协议三模式，数据重置、备份、恢复详细操作](https://youtu.be/xlvKnjQoF7c)
 
 [x-ui搭建xray协议大更新（二）：集成Argo固定隧道、临时隧道](https://youtu.be/NCPCHAi8pzs)
