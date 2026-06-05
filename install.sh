@@ -373,11 +373,12 @@ fi
 kill -15 $(cat /usr/local/x-ui/xuiargopid.log 2>/dev/null) >/dev/null 2>&1
 kill -15 $(cat /usr/local/x-ui/xuiargoympid.log 2>/dev/null) >/dev/null 2>&1
 kill -15 $(cat /usr/local/x-ui/xuiwpphid.log 2>/dev/null) >/dev/null 2>&1
-rm /usr/bin/x-ui -f
-rm /etc/x-ui-yg/ -rf
-rm /usr/local/x-ui/ -rf
+kill -15 $(pgrep -f 'webxui' 2>/dev/null) >/dev/null 2>&1
+rm -rf /root/webxui /etc/local.d/alpinesub.start /usr/local/x-ui/ /etc/x-ui-yg/ /usr/bin/x-ui xuiyg_update ygkkkcaz
 uncronxui
-rm -rf xuiyg_update ygkkkcaz
+iptables -t nat -F PREROUTING >/dev/null 2>&1
+netfilter-persistent save >/dev/null 2>&1
+service iptables save >/dev/null 2>&1
 #sed -i '/^precedence ::ffff:0:0\/96  100/d' /etc/gai.conf 2>/dev/null
 echo
 green "x-ui已卸载完成"
