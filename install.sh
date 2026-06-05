@@ -703,9 +703,30 @@ gitlabsub
 elif [ "$menu" = "4" ];then
 warpwg
 elif [ "$menu" = "5" ];then
+hyjpport
+elif [ "$menu" = "6" ];then
 ipsub
 else 
 show_menu
+fi
+}
+
+hyjpport(){
+echo "设置Hysteria2协议的跳跃端口：$hyjpt"
+iptables -t nat -F PREROUTING >/dev/null 2>&1
+ip6tables -t nat -F PREROUTING >/dev/null 2>&1
+hyport=$(cat "$HOME/agsbx/port_hy2")
+for p in ${hyjpt//,/ }; do
+iptables -t nat -A PREROUTING -p udp --dport "${p/-/:}" -j DNAT --to-destination :$hyport
+ip6tables -t nat -A PREROUTING -p udp --dport "${p/-/:}" -j DNAT --to-destination :$hyport
+done
+netfilter-persistent save >/dev/null 2>&1
+if command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1; then
+rc-update show default 2>/dev/null | grep -q 'iptables' || rc-update add iptables >/dev/null 2>&1
+rc-update show default 2>/dev/null | grep -q 'ip6tables' || rc-update add ip6tables >/dev/null 2>&1
+rc-service iptables save >/dev/null 2>&1
+rc-service ip6tables save >/dev/null 2>&1
+fi
 fi
 }
 
