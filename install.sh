@@ -1033,7 +1033,7 @@ fi
 echo "$token" > /usr/local/x-ui/bin/gitlabtoken.txt
 rm -rf /usr/local/x-ui/bin/.git
 git init >/dev/null 2>&1
-git add xui_singbox.json xui_clashmeta.yaml xui_ty.txt>/dev/null 2>&1
+git add sbox.json clmi.yaml jhsub.txt>/dev/null 2>&1
 git config --global user.email "${email}" >/dev/null 2>&1
 git config --global user.name "${userid}" >/dev/null 2>&1
 git commit -m "commit_add_$(date +"%F %T")" >/dev/null 2>&1
@@ -1052,9 +1052,9 @@ interact
 EOF
 chmod +x gitpush.sh
 ./gitpush.sh "git push -f origin main${gitlab_ml}" cat /usr/local/x-ui/bin/gitlabtoken.txt >/dev/null 2>&1
-echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/xui_singbox.json/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/sing_box_gitlab.txt
-echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/xui_clashmeta.yaml/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/clash_meta_gitlab.txt
-echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/xui_ty.txt/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/xui_ty_gitlab.txt
+echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/sbox.json/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/sing_box_gitlab.txt
+echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/clmi.yaml/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/clash_meta_gitlab.txt
+echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/jhsub.txt/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/xui_ty_gitlab.txt
 sharesubshow
 else
 yellow "设置Gitlab订阅链接失败，请反馈"
@@ -1105,9 +1105,9 @@ if [[ $(ls -a | grep '^\.git$') ]]; then
 if [ -f /usr/local/x-ui/bin/gitlab_ml_ml ]; then
 gitlab_ml=$(cat /usr/local/x-ui/bin/gitlab_ml_ml)
 fi
-git rm --cached xui_singbox.json xui_clashmeta.yaml xui_ty.txt >/dev/null 2>&1
+git rm --cached sbox.json clmi.yaml jhsub.txt >/dev/null 2>&1
 git commit -m "commit_rm_$(date +"%F %T")" >/dev/null 2>&1
-git add xui_singbox.json xui_clashmeta.yaml xui_ty.txt >/dev/null 2>&1
+git add sbox.json clmi.yaml jhsub.txt >/dev/null 2>&1
 git commit -m "commit_add_$(date +"%F %T")" >/dev/null 2>&1
 chmod +x gitpush.sh
 ./gitpush.sh "git push -f origin main${gitlab_ml}" cat /usr/local/x-ui/bin/gitlabtoken.txt >/dev/null 2>&1
@@ -1119,25 +1119,25 @@ cd
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 red "🚀X-UI聚合通用节点分享链接显示如下："
-red "文件目录 /usr/local/x-ui/bin/xui_ty.txt ，可直接在客户端剪切板导入添加" && sleep 2
+red "文件目录 /usr/local/x-ui/bin/jhsub.txt ，可直接在客户端剪切板导入添加" && sleep 2
 echo
-cat /usr/local/x-ui/bin/xui_ty.txt
+cat /usr/local/x-ui/bin/jhsub.txt
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 red "🚀X-UI-Clash-Meta配置文件操作如下："
-red "文件目录 /usr/local/x-ui/bin/xui_clashmeta.yaml ，复制自建以yaml文件格式为准" 
+red "文件目录 /usr/local/x-ui/bin/clmi.yaml ，复制自建以yaml文件格式为准" 
 echo
-red "输入：cat /usr/local/x-ui/bin/xui_clashmeta.yaml 即可显示配置内容" && sleep 2
+red "输入：cat /usr/local/x-ui/bin/clmi.yaml 即可显示配置内容" && sleep 2
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 red "🚀XUI-Sing-box-SFA/SFI/SFW配置文件操作如下："
-red "文件目录 /usr/local/x-ui/bin/xui_singbox.json ，复制自建以json文件格式为准"
+red "文件目录 /usr/local/x-ui/bin/sbox.json ，复制自建以json文件格式为准"
 echo
-red "输入：cat /usr/local/x-ui/bin/xui_singbox.json 即可显示配置内容" && sleep 2
+red "输入：cat /usr/local/x-ui/bin/sbox.json 即可显示配置内容" && sleep 2
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo
@@ -1156,7 +1156,7 @@ dnsip='tls://[2001:4860:4860::8888]/dns-query'
 else
 dnsip='tls://8.8.8.8/dns-query'
 fi
-cat > /usr/local/x-ui/bin/xui_singbox.json <<EOF
+cat > /usr/local/x-ui/bin/sbox.json <<EOF
 {
   "log": {
     "disabled": false,
@@ -1361,7 +1361,7 @@ cat > /usr/local/x-ui/bin/xui_singbox.json <<EOF
 }
 EOF
 
-cat > /usr/local/x-ui/bin/xui_clashmeta.yaml <<EOF
+cat > /usr/local/x-ui/bin/clmi.yaml <<EOF
 port: 7890
 allow-lan: true
 mode: rule
@@ -1429,13 +1429,13 @@ rules:
 EOF
 
 xui_sb_cl(){
-sed -i "/#_0/r /usr/local/x-ui/bin/cl${i}.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - $tag" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - $tag" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - $tag" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sb${i}.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"$tag\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"$tag\"," /usr/local/x-ui/bin/xui_singbox.json
+sed -i "/#_0/r /usr/local/x-ui/bin/cl${i}.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - $tag" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - $tag" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - $tag" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sb${i}.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"$tag\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"$tag\"," /usr/local/x-ui/bin/sbox.json
 }
 
 tag_count=$(jq '.inbounds | map(select(.protocol == "vless" or .protocol == "vmess" or .protocol == "trojan" or .protocol == "shadowsocks")) | length' /usr/local/x-ui/bin/config.json)
@@ -1443,7 +1443,7 @@ for ((i=0; i<tag_count; i++))
 do
 jq -c ".inbounds | map(select(.protocol == \"vless\" or .protocol == \"vmess\" or .protocol == \"trojan\" or .protocol == \"shadowsocks\"))[$i]" /usr/local/x-ui/bin/config.json > "/usr/local/x-ui/bin/$((i+1)).log"
 done
-rm -rf /usr/local/x-ui/bin/ty.txt
+rm -rf /usr/local/x-ui/bin/jhsub.txt
 xip1=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 1p)
 ymip=$(cat /root/ygkkkca/ca.log 2>/dev/null)
 directory="/usr/local/x-ui/bin/"
@@ -1502,7 +1502,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   client-fingerprint: $finger   
 
 EOF
-echo "vless://$uuid@$xip1:$vl_port?type=tcp&security=reality&sni=$vl_name&pbk=$public_key&flow=xtls-rprx-vision&sid=$short_id&fp=$finger#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "vless://$uuid@$xip1:$vl_port?type=tcp&security=reality&sni=$vl_name&pbk=$public_key&flow=xtls-rprx-vision&sid=$short_id&fp=$finger#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vless-tcp-vision
@@ -1541,7 +1541,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
 
 
 EOF
-echo "vless://$uuid@$servip:$vl_port?type=tcp&security=tls&flow=xtls-rprx-vision#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "vless://$uuid@$servip:$vl_port?type=tcp&security=tls&flow=xtls-rprx-vision#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vless-ws
@@ -1624,7 +1624,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
       Host: $vl_name 
 
 EOF
-echo "vless://$uuid@$servip:$vl_port?type=ws&security=$tlsw&sni=$vl_name&path=$ws_path&host=$vl_name#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "vless://$uuid@$servip:$vl_port?type=ws&security=$tlsw&sni=$vl_name&path=$ws_path&host=$vl_name#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vmess-ws
@@ -1707,7 +1707,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
       Host: $vm_name
 
 EOF
-echo -e "vmess://$(echo '{"add":"'$servip'","aid":"0","host":"'$vm_name'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"'$vm_port'","ps":"'$tag'","tls":"'$tlsw'","sni":"'$vm_name'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
+echo -e "vmess://$(echo '{"add":"'$servip'","aid":"0","host":"'$vm_name'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"'$vm_port'","ps":"'$tag'","tls":"'$tlsw'","sni":"'$vm_name'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vmess-tcp
@@ -1758,7 +1758,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   tls: $tls
 
 EOF
-echo -e "vmess://$(echo '{"add":"'$servip'","aid":"0","id":"'$uuid'","net":"tcp","port":"'$vm_port'","ps":"'$tag'","tls":"'$tlst'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
+echo -e "vmess://$(echo '{"add":"'$servip'","aid":"0","id":"'$uuid'","net":"tcp","port":"'$vm_port'","ps":"'$tag'","tls":"'$tlst'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vless-tcp
@@ -1806,7 +1806,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   tls: $tls
 
 EOF
-echo "vless://$uuid@$servip:$vl_port?type=tcp&security=$tlst#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "vless://$uuid@$servip:$vl_port?type=tcp&security=$tlst#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #trojan-tcp-tls
@@ -1842,7 +1842,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   skip-cert-verify: false
 
 EOF
-echo "trojan://$password@$servip:$vl_port?security=tls&type=tcp#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "trojan://$password@$servip:$vl_port?security=tls&type=tcp#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #trojan-ws-tls
@@ -1896,7 +1896,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
       Host: $vm_name
 
 EOF
-echo "trojan://$password@$servip:$vl_port?security=tls&type=ws&path=$ws_path&host=$vm_name#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "trojan://$password@$servip:$vl_port?security=tls&type=ws&path=$ws_path&host=$vm_name#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #shadowsocks-tcp
@@ -1929,7 +1929,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   udp: true
 
 EOF
-echo -e "ss://$ssmethod:$password@$servip:$vm_port#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo -e "ss://$ssmethod:$password@$servip:$vm_port#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 fi
 else
@@ -2042,22 +2042,22 @@ cat > /usr/local/x-ui/bin/clvlargo.log <<EOF
       Host: $argolsym 
 
 EOF
-sed -i "/#_0/r /usr/local/x-ui/bin/clvltargo.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_0/r /usr/local/x-ui/bin/clvlargo.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvltargo.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vl-tls-argo临时-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vl-tls-argo临时-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvlargo.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vl-argo临时-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vl-argo临时-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-echo "vless://$uuid@$cdnargo:8880?type=ws&security=none&path=$ws_path&host=$argolsym#vl-argo临时-8880" >>/usr/local/x-ui/bin/ty.txt
-echo "vless://$uuid@$cdnargo:8443?type=ws&security=tls&path=$ws_path&host=$argolsym#vl-tls-argo临时-8443" >>/usr/local/x-ui/bin/ty.txt
+sed -i "/#_0/r /usr/local/x-ui/bin/clvltargo.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_0/r /usr/local/x-ui/bin/clvlargo.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvltargo.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vl-tls-argo临时-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vl-tls-argo临时-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvlargo.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vl-argo临时-8880\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vl-argo临时-8880\"," /usr/local/x-ui/bin/sbox.json
+echo "vless://$uuid@$cdnargo:8880?type=ws&security=none&path=$ws_path&host=$argolsym#vl-argo临时-8880" >>/usr/local/x-ui/bin/jhsub.txt
+echo "vless://$uuid@$cdnargo:8443?type=ws&security=tls&path=$ws_path&host=$argolsym#vl-tls-argo临时-8443" >>/usr/local/x-ui/bin/jhsub.txt
 
 elif [[ $argoprotocol = vmess ]]; then
 #vmess-ws-tls-argo临时
@@ -2163,22 +2163,22 @@ cat > /usr/local/x-ui/bin/clvmargo.log <<EOF
       Host: $argolsym
 
 EOF
-sed -i "/#_0/r /usr/local/x-ui/bin/clvmtargo.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_0/r /usr/local/x-ui/bin/clvmargo.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmtargo.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vm-tls-argo临时-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vm-tls-argo临时-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmargo.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vm-argo临时-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vm-argo临时-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argolsym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8880","ps":"vm-argo临时-8880","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
-echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argolsym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8443","ps":"vm-tls-argo临时-8443","tls":"tls","sni":"'$argolsym'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
+sed -i "/#_0/r /usr/local/x-ui/bin/clvmtargo.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_0/r /usr/local/x-ui/bin/clvmargo.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmtargo.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vm-tls-argo临时-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vm-tls-argo临时-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmargo.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vm-argo临时-8880\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vm-argo临时-8880\"," /usr/local/x-ui/bin/sbox.json
+echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argolsym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8880","ps":"vm-argo临时-8880","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
+echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argolsym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8443","ps":"vm-tls-argo临时-8443","tls":"tls","sni":"'$argolsym'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
 fi
 fi
 
@@ -2286,22 +2286,22 @@ cat > /usr/local/x-ui/bin/clvlargoym.log <<EOF
       Host: $argoym 
 
 EOF
-sed -i "/#_0/r /usr/local/x-ui/bin/clvltargoym.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_0/r /usr/local/x-ui/bin/clvlargoym.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvltargoym.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vl-tls-argo固定-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vl-tls-argo固定-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvlargoym.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vl-argo固定-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vl-argo固定-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-echo "vless://$uuid@$cdnargo:8880?type=ws&security=none&path=$ws_path&host=$argoym#vl-argo临时-8880" >>/usr/local/x-ui/bin/ty.txt
-echo "vless://$uuid@$cdnargo:8443?type=ws&security=tls&path=$ws_path&host=$argoym#vl-tls-argo临时-8443" >>/usr/local/x-ui/bin/ty.txt
+sed -i "/#_0/r /usr/local/x-ui/bin/clvltargoym.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_0/r /usr/local/x-ui/bin/clvlargoym.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvltargoym.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vl-tls-argo固定-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vl-tls-argo固定-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvlargoym.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vl-argo固定-8880\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vl-argo固定-8880\"," /usr/local/x-ui/bin/sbox.json
+echo "vless://$uuid@$cdnargo:8880?type=ws&security=none&path=$ws_path&host=$argoym#vl-argo临时-8880" >>/usr/local/x-ui/bin/jhsub.txt
+echo "vless://$uuid@$cdnargo:8443?type=ws&security=tls&path=$ws_path&host=$argoym#vl-tls-argo临时-8443" >>/usr/local/x-ui/bin/jhsub.txt
 
 elif [[ $argoprotocol = vmess ]]; then
 #vmess-ws-tls-argo固定
@@ -2407,33 +2407,33 @@ cat > /usr/local/x-ui/bin/clvmargoym.log <<EOF
       Host: $argoym
 
 EOF
-sed -i "/#_0/r /usr/local/x-ui/bin/clvmtargoym.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_0/r /usr/local/x-ui/bin/clvmargoym.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmtargoym.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vm-tls-argo固定-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vm-tls-argo固定-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmargoym.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vm-argo固定-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vm-argo固定-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argoym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8880","ps":"vm-argo固定-8880","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
-echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argoym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8443","ps":"vm-tls-argo固定-8443","tls":"tls","sni":"'$argoym'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
+sed -i "/#_0/r /usr/local/x-ui/bin/clvmtargoym.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_0/r /usr/local/x-ui/bin/clvmargoym.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmtargoym.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vm-tls-argo固定-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vm-tls-argo固定-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmargoym.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vm-argo固定-8880\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vm-argo固定-8880\"," /usr/local/x-ui/bin/sbox.json
+echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argoym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8880","ps":"vm-argo固定-8880","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
+echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argoym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8443","ps":"vm-tls-argo固定-8443","tls":"tls","sni":"'$argoym'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
 fi
 fi
-line=$(grep -B1 "//_1" /usr/local/x-ui/bin/xui_singbox.json | grep -v "//_1")
+line=$(grep -B1 "//_1" /usr/local/x-ui/bin/sbox.json | grep -v "//_1")
 new_line=$(echo "$line" | sed 's/,//g')
-sed -i "/^$line$/s/.*/$new_line/g" /usr/local/x-ui/bin/xui_singbox.json
-sed -i '/\/\/_0\|\/\/_1\|\/\/_2/d' /usr/local/x-ui/bin/xui_singbox.json
-sed -i '/#_0\|#_1\|#_2\|#_3/d' /usr/local/x-ui/bin/xui_clashmeta.yaml
+sed -i "/^$line$/s/.*/$new_line/g" /usr/local/x-ui/bin/sbox.json
+sed -i '/\/\/_0\|\/\/_1\|\/\/_2/d' /usr/local/x-ui/bin/sbox.json
+sed -i '/#_0\|#_1\|#_2\|#_3/d' /usr/local/x-ui/bin/clmi.yaml
 find /usr/local/x-ui/bin -type f -name "*.log" -delete
-baseurl=$(base64 -w 0 < /usr/local/x-ui/bin/ty.txt 2>/dev/null)
-v2sub=$(cat /usr/local/x-ui/bin/ty.txt 2>/dev/null)
-echo "$v2sub" > /usr/local/x-ui/bin/xui_ty.txt
+baseurl=$(base64 -w 0 < /usr/local/x-ui/bin/jhsub.txt 2>/dev/null)
+v2sub=$(cat /usr/local/x-ui/bin/jhsub.txt 2>/dev/null)
+echo "$v2sub" > /usr/local/x-ui/bin/jhsub.txt
 }
 
 insxuiwpph(){
