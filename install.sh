@@ -717,9 +717,9 @@ subtoken="$(/usr/local/x-ui/x-ui setting -show 2>/dev/null | awk -F': ' 'NR==4{p
 else
 subtoken="$menu"
 fi
-rm -rf /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"
-echo $subtoken > /usr/local/x-ui/subtoken.log
-green "订阅链接路径密码：$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"
+rm -rf /root/webxui/"$(cat /usr/local/x-ui/bin/subtoken.log 2>/dev/null)"
+echo $subtoken > /usr/local/x-ui/bin/subtoken.log
+green "订阅链接路径密码：$(cat /usr/local/x-ui/bin/subtoken.log 2>/dev/null)"
 }
 subportipsub(){
 echo
@@ -729,8 +729,8 @@ subport=$(shuf -i 10000-65535 -n 1)
 else
 subport="$menu"
 fi
-echo $subport > /usr/local/x-ui/subport.log
-green "订阅链接端口：$(cat /usr/local/x-ui/subport.log 2>/dev/null)"
+echo $subport > /usr/local/x-ui/bin/subport.log
+green "订阅链接端口：$(cat /usr/local/x-ui/bin/subport.log 2>/dev/null)"
 }
 echo
 yellow "1：重置安装本地IP订阅链接"
@@ -760,28 +760,28 @@ fi
 echo
 green "请稍后…………"
 kill -15 $(pgrep -f 'webxui' 2>/dev/null) >/dev/null 2>&1
-mkdir -p /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"
-ln -sf /usr/local/x-ui/clmi.yaml /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"/clmi.yaml
-ln -sf /usr/local/x-ui/sbox.json /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"/sbox.json
-ln -sf /usr/local/x-ui/jhsub.txt /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"/jhsub.txt
+mkdir -p /root/webxui/"$(cat /usr/local/x-ui/bin/subtoken.log 2>/dev/null)"
+ln -sf /usr/local/x-ui/bin/clmi.yaml /root/webxui/"$(cat /usr/local/x-ui/bin/subtoken.log 2>/dev/null)"/clmi.yaml
+ln -sf /usr/local/x-ui/bin/sbox.json /root/webxui/"$(cat /usr/local/x-ui/bin/subtoken.log 2>/dev/null)"/sbox.json
+ln -sf /usr/local/x-ui/bin/jhsub.txt /root/webxui/"$(cat /usr/local/x-ui/bin/subtoken.log 2>/dev/null)"/jhsub.txt
 if command -v apk >/dev/null 2>&1; then
-busybox-extras httpd -f -p "$(cat /usr/local/x-ui/subport.log 2>/dev/null)" -h /root/webxui > /dev/null 2>&1 &
+busybox-extras httpd -f -p "$(cat /usr/local/x-ui/bin/subport.log 2>/dev/null)" -h /root/webxui > /dev/null 2>&1 &
 else
-busybox httpd -f -p "$(cat /usr/local/x-ui/subport.log 2>/dev/null)" -h /root/webxui > /dev/null 2>&1 &
+busybox httpd -f -p "$(cat /usr/local/x-ui/bin/subport.log 2>/dev/null)" -h /root/webxui > /dev/null 2>&1 &
 fi
 sleep 5
 if command -v apk >/dev/null 2>&1; then
 cat > /etc/local.d/alpinesub.start <<'EOF'
 #!/bin/bash
 sleep 10
-busybox-extras httpd -f -p $(cat /usr/local/x-ui/subport.log 2>/dev/null) -h /root/webxui > /dev/null 2>&1 &
+busybox-extras httpd -f -p $(cat /usr/local/x-ui/bin/subport.log 2>/dev/null) -h /root/webxui > /dev/null 2>&1 &
 EOF
 chmod +x /etc/local.d/alpinesub.start
 rc-update add local default >/dev/null 2>&1
 else
 crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/webxui/d' /tmp/crontab.tmp
-echo '@reboot sleep 10 && /bin/bash -c "busybox httpd -f -p $(cat /usr/local/x-ui/subport.log 2>/dev/null) -h /root/webxui > /dev/null 2>&1 &"' >> /tmp/crontab.tmp
+echo '@reboot sleep 10 && /bin/bash -c "busybox httpd -f -p $(cat /usr/local/x-ui/bin/subport.log 2>/dev/null) -h /root/webxui > /dev/null 2>&1 &"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 fi
