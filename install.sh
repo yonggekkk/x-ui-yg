@@ -701,9 +701,91 @@ elif [ "$menu" = "3" ];then
 gitlabsub
 elif [ "$menu" = "4" ];then
 warpwg
+elif [ "$menu" = "5" ];then
+ipsub
 else 
 show_menu
 fi
+}
+
+ipsub(){
+subtokenipsub(){
+echo
+readp "输入订阅链接路径密码（回车表示xui面版登录根路径）：" menu
+if [ -z "$menu" ]; then
+subtoken="$(/usr/local/x-ui/x-ui setting -show 2>/dev/null | awk -F': ' 'NR==4{print $2}' | tr -d '/')"
+else
+subtoken="$menu"
+fi
+rm -rf /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"
+echo $subtoken > /usr/local/x-ui/subtoken.log
+green "订阅链接路径密码：$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"
+}
+subportipsub(){
+echo
+readp "输入未被占用且可用的订阅链接端口（回车表示随机端口）：" menu
+if [ -z "$menu" ]; then
+subport=$(shuf -i 10000-65535 -n 1)
+else
+subport="$menu"
+fi
+echo $subport > /usr/local/x-ui/subport.log
+green "订阅链接端口：$(cat /usr/local/x-ui/subport.log 2>/dev/null)"
+}
+echo
+yellow "1：重置安装本地IP订阅链接"
+yellow "2：更换订阅链接路径密码"
+yellow "3：更换订阅链接端口"
+yellow "4：卸载本地IP订阅链接"
+yellow "0：返回上层"
+readp "请选择【0-4】：" menu
+if [ "$menu" = "1" ]; then
+subtokenipsub && subportipsub
+elif [ "$menu" = "2" ];then
+subtokenipsub
+elif [ "$menu" = "3" ];then
+subportipsub
+elif [ "$menu" = "4" ];then
+kill -15 $(pgrep -f 'webxui' 2>/dev/null) >/dev/null 2>&1
+crontab -l 2>/dev/null > /tmp/crontab.tmp
+sed -i '/webxui/d' /tmp/crontab.tmp
+crontab /tmp/crontab.tmp >/dev/null 2>&1
+rm /tmp/crontab.tmp
+rm -rf /root/webxui
+rm -rf /etc/local.d/alpinesub.start
+green "本地IP订阅链接已卸载完成" && sleep 3 && exit
+else
+changeserv
+fi
+echo
+green "请稍后…………"
+kill -15 $(pgrep -f 'webxui' 2>/dev/null) >/dev/null 2>&1
+mkdir -p /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"
+ln -sf /usr/local/x-ui/clmi.yaml /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"/clmi.yaml
+ln -sf /usr/local/x-ui/sbox.json /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"/sbox.json
+ln -sf /usr/local/x-ui/jhsub.txt /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"/jhsub.txt
+if command -v apk >/dev/null 2>&1; then
+busybox-extras httpd -f -p "$(cat /usr/local/x-ui/subport.log 2>/dev/null)" -h /root/webxui > /dev/null 2>&1 &
+else
+busybox httpd -f -p "$(cat /usr/local/x-ui/subport.log 2>/dev/null)" -h /root/webxui > /dev/null 2>&1 &
+fi
+sleep 5
+if command -v apk >/dev/null 2>&1; then
+cat > /etc/local.d/alpinesub.start <<'EOF'
+#!/bin/bash
+sleep 10
+busybox-extras httpd -f -p $(cat /usr/local/x-ui/subport.log 2>/dev/null) -h /root/webxui > /dev/null 2>&1 &
+EOF
+chmod +x /etc/local.d/alpinesub.start
+rc-update add local default >/dev/null 2>&1
+else
+crontab -l 2>/dev/null > /tmp/crontab.tmp
+sed -i '/webxui/d' /tmp/crontab.tmp
+echo '@reboot sleep 10 && /bin/bash -c "busybox httpd -f -p $(cat /usr/local/x-ui/subport.log 2>/dev/null) -h /root/webxui > /dev/null 2>&1 &"' >> /tmp/crontab.tmp
+crontab /tmp/crontab.tmp >/dev/null 2>&1
+rm /tmp/crontab.tmp
+fi
+sleep 1 && green "本地IP订阅链接已更新完成" && sleep 3 && x-ui
 }
 
 warpwg(){
