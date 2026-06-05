@@ -2757,6 +2757,19 @@ xpath=$(echo $acp | awk '{print $8}')
 xport=$(echo $acp | awk '{print $6}')
 xip1=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 1p)
 xip2=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 2p)
+temp=$(systemctl is-active x-ui 2>/dev/null | grep -w active)
+if [[ x"${temp}" == x"active" ]]; then
+if [ -s /usr/local/x-ui/bin/subport.log ]; then
+showsubport=$(cat /usr/local/x-ui/bin/subport.log)
+if ps -ef 2>/dev/null | grep "$showsubport" | grep -v grep >/dev/null; then
+showsubtoken=$(cat /usr/local/x-ui/bin/subtoken.log 2>/dev/null)
+suburl="$xip1:$showsubport/$showsubtoken"
+echo "Clash/Mihomo本地IP订阅地址：http://$suburl/clmi.yaml"
+echo "Sing-box本地IP订阅地址：http://$suburl/sbox.json"
+echo "聚合协议本地IP订阅地址：http://$suburl/jhsub.txt"
+fi
+fi
+fi
 if [ "$xpath" == "/" ]; then
 pathk="$sred【严重安全提示: 请进入面板设置，添加url根路径】$plain"
 fi
