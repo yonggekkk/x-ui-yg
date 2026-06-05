@@ -325,6 +325,9 @@ echo "----------------------------------------------------------------------"
 userinstall
 portinstall
 pathinstall
+mkdir -p /root/ygkkkcaz
+curl -Ls -o /root/ygkkkcaz/private.key https://github.com/yonggekkk/argosbx/releases/download/argosbx/private.key
+curl -Ls -o /root/ygkkkcaz/cert.crt https://github.com/yonggekkk/argosbx/releases/download/argosbx/cert.crt
 resinstall
 #[[ -e /etc/gai.conf ]] && grep -qE '^ *precedence ::ffff:0:0/96  100' /etc/gai.conf || echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf 2>/dev/null
 }
@@ -374,7 +377,7 @@ rm /usr/bin/x-ui -f
 rm /etc/x-ui-yg/ -rf
 rm /usr/local/x-ui/ -rf
 uncronxui
-rm -rf xuiyg_update
+rm -rf xuiyg_update ygkkkcaz
 #sed -i '/^precedence ::ffff:0:0\/96  100/d' /etc/gai.conf 2>/dev/null
 echo
 green "x-ui已卸载完成"
