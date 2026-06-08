@@ -727,7 +727,6 @@ rc-update show default 2>/dev/null | grep -q 'ip6tables' || rc-update add ip6tab
 rc-service iptables save >/dev/null 2>&1
 rc-service ip6tables save >/dev/null 2>&1
 fi
-fi
 }
 
 ipsub(){
