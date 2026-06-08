@@ -712,8 +712,8 @@ fi
 }
 
 hyjpport(){
-readp "指定Hysteria2协议的主端口：" $hyport
-readp "设置Hysteria2协议主端口 $hyport 下的跳跃端口："$hyjpt
+readp "指定已设置的Hysteria2协议的主端口：" $hyport
+readp "设置转发的跳跃端口：" $hyjpt
 iptables -t nat -F PREROUTING >/dev/null 2>&1
 ip6tables -t nat -F PREROUTING >/dev/null 2>&1
 for p in ${hyjpt//,/ }; do
