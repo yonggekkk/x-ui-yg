@@ -728,7 +728,7 @@ rc-service iptables save >/dev/null 2>&1
 rc-service ip6tables save >/dev/null 2>&1
 fi
 sharesub_sbcl >/dev/null 2>&1
-green "已设置Hysteria2协议主端口 $hyport 下的跳跃端口：$hyjpt"
+green "已设置Hysteria2协议主端口 $hyport 转发的跳跃端口：$hyjpt"
 }
 
 ipsub(){
