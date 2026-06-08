@@ -1468,6 +1468,7 @@ if [[ -n $tls ]]; then
 hy2_ins=false 
 hy2_name=$tls
 else
+SHA256=$(openssl x509 -in /root/ygkkkcaz/cert.crt -outform DER | sha256sum | awk '{print $1}')
 hy2_ins=true 
 hy2_name=www.bing.com
 fi
