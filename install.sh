@@ -776,7 +776,7 @@ crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 rm -rf /root/webxui
 rm -rf /etc/local.d/alpinesub.start
-green "本地IP订阅链接已卸载完成"
+green "本地IP订阅链接已卸载完成" && exit
 else
 changeserv
 fi
