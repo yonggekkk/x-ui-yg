@@ -712,10 +712,10 @@ fi
 }
 
 hyjpport(){
-echo "设置Hysteria2协议的跳跃端口：$hyjpt"
+readp "指定Hysteria2协议的主端口：" $hyport
+readp "设置Hysteria2协议主端口 $hyport 下的跳跃端口："$hyjpt
 iptables -t nat -F PREROUTING >/dev/null 2>&1
 ip6tables -t nat -F PREROUTING >/dev/null 2>&1
-hyport=$(cat "$HOME/agsbx/port_hy2")
 for p in ${hyjpt//,/ }; do
 iptables -t nat -A PREROUTING -p udp --dport "${p/-/:}" -j DNAT --to-destination :$hyport
 ip6tables -t nat -A PREROUTING -p udp --dport "${p/-/:}" -j DNAT --to-destination :$hyport
@@ -727,6 +727,7 @@ rc-update show default 2>/dev/null | grep -q 'ip6tables' || rc-update add ip6tab
 rc-service iptables save >/dev/null 2>&1
 rc-service ip6tables save >/dev/null 2>&1
 fi
+green "已设置Hysteria2协议主端口 $hyport 下的跳跃端口：$hyjpt"
 }
 
 ipsub(){
@@ -1446,11 +1447,12 @@ sed -i "/\/\/_1/ i\\ \"$tag\"," /usr/local/x-ui/bin/sbox.json
 sed -i "/\/\/_2/ i\\ \"$tag\"," /usr/local/x-ui/bin/sbox.json
 }
 
-tag_count=$(jq '.inbounds | map(select(.protocol == "vless" or .protocol == "vmess" or .protocol == "trojan" or .protocol == "shadowsocks")) | length' /usr/local/x-ui/bin/config.json)
-for ((i=0; i<tag_count; i++))
-do
-jq -c ".inbounds | map(select(.protocol == \"vless\" or .protocol == \"vmess\" or .protocol == \"trojan\" or .protocol == \"shadowsocks\"))[$i]" /usr/local/x-ui/bin/config.json > "/usr/local/x-ui/bin/$((i+1)).log"
+inbounds=$(jq '.inbounds | map(select(.protocol == "hysteria" or .protocol == "vless" or .protocol == "vmess" or .protocol == "trojan" or .protocol == "shadowsocks"))' /usr/local/x-ui/bin/config.json)
+tag_count=$(echo "$inbounds" | jq 'length')
+for ((i=0; i<tag_count; i++)); do
+echo "$inbounds" | jq -c ".[$i]" > "/usr/local/x-ui/bin/$((i+1)).log"
 done
+
 rm -rf /usr/local/x-ui/bin/jhsub.txt
 xip1=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 1p)
 ymip=$(cat /root/ygkkkca/ca.log 2>/dev/null)
@@ -1458,8 +1460,76 @@ directory="/usr/local/x-ui/bin/"
 for i in $(seq 1 $tag_count); do
 file="${directory}${i}.log"
 if [ -f "$file" ]; then
+#hysteria
+if grep -q "hysteria" "$file"; then
+[[ -n $ymip ]] && servip=$ymip || servip=$xip1
+tls=$(jq -r '.streamSettings.tlsSettings.serverName' /usr/local/x-ui/bin/${i}.log)
+if [[ -n $tls ]]; then
+hy2_ins=false 
+hy2_name=$tls
+else
+hy2_ins=true 
+hy2_name=www.bing.com
+fi
+uuid=$(jq -r '.settings.clients[0].auth' /usr/local/x-ui/bin/${i}.log)
+hy2_port=$(jq -r '.port' /usr/local/x-ui/bin/${i}.log)
+tag=$hy2_port-hy2
+hy2_ports=$(iptables -t nat -nL --line 2>/dev/null | grep -w "$hy2_port" | awk '{print $8}' | sed 's/dpts://; s/dpt://' | tr '\n' ',' | sed 's/,$//')
+if [[ -n $hy2_ports ]]; then
+cmhy2pt=$(echo $hy2_ports | tr ':' '-')
+hyps="&mport=$cmhy2pt"
+sbhy2pt=$(echo "$hy2_ports" | grep -o '[0-9]\+:[0-9]\+' | sed 's/.*/"&"/' | paste -sd,)
+else
+hyps=
+fi
+sbhy2ports(){
+if [[ -n $hy2_ports ]]; then
+    cat <<EOF
+  "server_ports": [ $sbhy2pt ],
+EOF
+fi
+}
+
+cat > /usr/local/x-ui/bin/sb${i}.log <<EOF
+
+    {
+        "type": "hysteria2",
+        "tag": "$tag",
+        "server": "$servip",
+        "server_port": $hy2_port,
+$(sbhy2ports)
+        "password": "$uuid",
+        "tls": {
+            "enabled": true,
+            "server_name": "$hy2_name",
+            "insecure": $hy2_ins,
+            "alpn": [
+                "h3"
+            ]
+        }
+    },
+EOF
+
+cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
+
+- name: $tag                            
+  type: hysteria2                                      
+  server: $servip                               
+  port: $hy2_port
+  ports: $cmhy2pt
+  password: $uuid                          
+  alpn:
+    - h3
+  sni: $hy2_name                               
+  skip-cert-verify: $hy2_ins
+  fast-open: true
+
+EOF
+echo "hysteria2://$uuid@$servip:$hy2_port?security=tls&alpn=h3&insecure=0&allowInsecure=0$hyps&sni=$hy2_name&pinSHA256=$SHA256#$tag" >>/usr/local/x-ui/bin/jhsub.txt
+xui_sb_cl
+
 #vless-reality-vision
-if grep -q "vless" "$file" && grep -q "reality" "$file" && grep -q "vision" "$file"; then
+elif grep -q "vless" "$file" && grep -q "reality" "$file" && grep -q "vision" "$file"; then
 finger=$(jq -r '.streamSettings.realitySettings.fingerprint' /usr/local/x-ui/bin/${i}.log)
 vl_name=$(jq -r '.streamSettings.realitySettings.serverNames[0]' /usr/local/x-ui/bin/${i}.log)
 public_key=$(jq -r '.streamSettings.realitySettings.publicKey' /usr/local/x-ui/bin/${i}.log)
@@ -1496,7 +1566,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
 
 - name: $tag               
   type: vless
-  server: $xip1                           
+  server: $xip1                         
   port: $vl_port                                
   uuid: $uuid   
   network: tcp
