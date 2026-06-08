@@ -727,6 +727,7 @@ rc-update show default 2>/dev/null | grep -q 'ip6tables' || rc-update add ip6tab
 rc-service iptables save >/dev/null 2>&1
 rc-service ip6tables save >/dev/null 2>&1
 fi
+sharesub_sbcl >/dev/null 2>&1
 green "已设置Hysteria2协议主端口 $hyport 下的跳跃端口：$hyjpt"
 }
 
@@ -775,7 +776,7 @@ crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 rm -rf /root/webxui
 rm -rf /etc/local.d/alpinesub.start
-green "本地IP订阅链接已卸载完成" && sleep 3 && exit
+green "本地IP订阅链接已卸载完成"
 else
 changeserv
 fi
@@ -807,7 +808,7 @@ echo '@reboot sleep 10 && /bin/bash -c "busybox httpd -f -p $(cat /usr/local/x-u
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 fi
-sleep 1 && green "本地IP订阅链接已更新完成" && sleep 3 && x-ui
+sharesub_sbcl >/dev/null 2>&1 && green "本地IP订阅链接已更新完成" && sleep 2 && x-ui
 }
 
 warpwg(){
@@ -914,7 +915,7 @@ echo "$!" > /usr/local/x-ui/xuiargopid.log
 sleep 20
 if [[ -n $(curl -sL https://$(cat /usr/local/x-ui/argo.log 2>/dev/null | grep -a trycloudflare.com | awk 'NR==2{print}' | awk -F// '{print $2}' | awk '{print $1}')/ -I | awk 'NR==1 && /404|400|503/') ]]; then
 argo=$(cat /usr/local/x-ui/argo.log 2>/dev/null | grep -a trycloudflare.com | awk 'NR==2{print}' | awk -F// '{print $2}' | awk '{print $1}')
-blue "Argo隧道申请成功，域名验证有效：$argo" && sleep 2
+blue "Argo隧道申请成功，域名验证有效：$argo"
 break
 fi
 if [ $i -eq 5 ]; then
@@ -931,6 +932,7 @@ crontab -l 2>/dev/null > /tmp/crontab.tmp
 echo '@reboot sleep 10 && /bin/bash -c "/usr/local/x-ui/cloudflared tunnel --url http://localhost:$(cat /usr/local/x-ui/xuiargoport.log) --edge-ip-version auto --no-autoupdate --protocol http2 > /usr/local/x-ui/argo.log 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargopid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
+sharesub_sbcl >/dev/null 2>&1
 elif [ "$menu" = "2" ]; then
 kill -15 $(cat /usr/local/x-ui/xuiargopid.log 2>/dev/null) >/dev/null 2>&1
 rm -rf /usr/local/x-ui/argo.log /usr/local/x-ui/xuiargopid.log /usr/local/x-ui/xuiargoport.log
@@ -939,6 +941,7 @@ sed -i '/xuiargopid.log/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 green "已卸载Argo临时隧道"
+sharesub_sbcl >/dev/null 2>&1
 else
 xuiargo
 fi
@@ -979,6 +982,7 @@ crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 argo=$(cat /usr/local/x-ui/xuiargoym.log 2>/dev/null)
 blue "Argo固定隧道设置完成，固定域名：$argo"
+sharesub_sbcl >/dev/null 2>&1
 elif [ "$menu" = "2" ]; then
 kill -15 $(cat /usr/local/x-ui/xuiargoympid.log 2>/dev/null) >/dev/null 2>&1
 rm -rf /usr/local/x-ui/xuiargoym.log /usr/local/x-ui/xuiargoymport.log /usr/local/x-ui/xuiargoympid.log /usr/local/x-ui/xuiargotoken.log
@@ -987,6 +991,7 @@ sed -i '/xuiargoympid/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 green "已卸载Argo固定隧道"
+sharesub_sbcl >/dev/null 2>&1
 else
 xuiargo
 fi
@@ -1013,12 +1018,12 @@ red "如果VPS不支持以上13个CF标准端口（NAT类VPS），请在CF规则
 echo
 readp "输入自定义的优选IP/域名 (回车跳过表示恢复本地IP直连)：" menu
 [[ -z "$menu" ]] && > /usr/local/x-ui/bin/xuicdnip_ws.txt || echo "$menu" > /usr/local/x-ui/bin/xuicdnip_ws.txt
-green "设置成功，可选择7刷新" && sleep 2 && show_menu
+green "设置成功，可选择7刷新" && sharesub_sbcl >/dev/null 2>&1 && show_menu
 elif [ "$menu" = "2" ]; then
 red "请确保Argo临时隧道或者固定隧道的节点功能已启用" && sleep 2
 readp "输入自定义的优选IP/域名 (回车跳过表示用默认优选域名：www.visa.com.sg)：" menu
 [[ -z "$menu" ]] && > /usr/local/x-ui/bin/xuicdnip_argo.txt || echo "$menu" > /usr/local/x-ui/bin/xuicdnip_argo.txt
-green "设置成功，可选择7刷新" && sleep 2 && show_menu
+green "设置成功，可选择7刷新" && sharesub_sbcl >/dev/null 2>&1 && show_menu
 else
 changeserv
 fi
@@ -1624,7 +1629,7 @@ echo "vless://$uuid@$servip:$vl_port?type=tcp&security=tls&flow=xtls-rprx-vision
 xui_sb_cl
 
 #vless-ws
-elif grep -q "vless" "$file" && grep -q "ws" "$file" && ! grep -qw "{}}}" "$file"; then
+elif ! grep -q "selectedAuth" "$file" && ! grep -q "xhttp" "$file" && grep -q "vless" "$file" && grep -q "ws" "$file" && ! grep -qw "{}}}" "$file"; then
 ws_path=$(jq -r '.streamSettings.wsSettings.path' /usr/local/x-ui/bin/${i}.log)
 tls=$(jq -r '.streamSettings.security' /usr/local/x-ui/bin/${i}.log)
 vl_port=$(jq -r '.port' /usr/local/x-ui/bin/${i}.log)
@@ -1653,8 +1658,6 @@ else
 fi
 vl_name=$(jq -r '.streamSettings.wsSettings.headers.Host' /usr/local/x-ui/bin/${i}.log)
 uuid=$(jq -r '.settings.clients[0].id' /usr/local/x-ui/bin/${i}.log)
-
-
 
 cat > /usr/local/x-ui/bin/sb${i}.log <<EOF
 
@@ -1841,7 +1844,7 @@ echo -e "vmess://$(echo '{"add":"'$servip'","aid":"0","id":"'$uuid'","net":"tcp"
 xui_sb_cl
 
 #vless-tcp
-elif grep -q "vless" "$file" && grep -q "tcp" "$file"; then
+elif ! grep -q "selectedAuth" "$file" && ! grep -q "xhttp" "$file" && grep -q "vless" "$file" && grep -q "tcp" "$file"; then
 [[ -n $ymip ]] && servip=$ymip || servip=$xip1
 tls=$(jq -r '.streamSettings.security' /usr/local/x-ui/bin/${i}.log)
 if [[ $tls == 'tls' ]]; then
@@ -2859,6 +2862,7 @@ suburl="$xip1:$showsubport/$showsubtoken"
 echo "Clash/Mihomo本地IP订阅地址：http://$suburl/clmi.yaml"
 echo "Sing-box本地IP订阅地址：http://$suburl/sbox.json"
 echo "聚合协议本地IP订阅地址：http://$suburl/jhsub.txt"
+echo "------------------------------------------------------------------------------------"
 fi
 fi
 fi
