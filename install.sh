@@ -1530,7 +1530,7 @@ echo "hysteria2://$uuid@$servip:$hy2_port?security=tls&alpn=h3&insecure=0&allowI
 xui_sb_cl
 
 #vless-reality-vision
-elif grep -q "vless" "$file" && grep -q "reality" "$file" && grep -q "vision" "$file"; then
+elif ! grep -q "selectedAuth" "$file" && ! grep -q "xhttp" "$file" && grep -q "vless" "$file" && grep -q "reality" "$file" && grep -q "vision" "$file"; then
 finger=$(jq -r '.streamSettings.realitySettings.fingerprint' /usr/local/x-ui/bin/${i}.log)
 vl_name=$(jq -r '.streamSettings.realitySettings.serverNames[0]' /usr/local/x-ui/bin/${i}.log)
 public_key=$(jq -r '.streamSettings.realitySettings.publicKey' /usr/local/x-ui/bin/${i}.log)
@@ -1585,7 +1585,7 @@ echo "vless://$uuid@$xip1:$vl_port?type=tcp&security=reality&sni=$vl_name&pbk=$p
 xui_sb_cl
 
 #vless-tcp-vision
-elif grep -q "vless" "$file" && grep -q "vision" "$file" && grep -q "keyFile" "$file"; then
+elif ! grep -q "selectedAuth" "$file" && ! grep -q "xhttp" "$file" && grep -q "vless" "$file" && grep -q "vision" "$file" && grep -q "keyFile" "$file"; then
 [[ -n $ymip ]] && servip=$ymip || servip=$xip1
 uuid=$(jq -r '.settings.clients[0].id' /usr/local/x-ui/bin/${i}.log)
 vl_port=$(jq -r '.port' /usr/local/x-ui/bin/${i}.log)
