@@ -326,8 +326,10 @@ userinstall
 portinstall
 pathinstall
 mkdir -p /root/ygkkkcaz
-curl -Ls -o /root/ygkkkcaz/private.key https://github.com/yonggekkk/argosbx/releases/download/argosbx/private.key
-curl -Ls -o /root/ygkkkcaz/cert.crt https://github.com/yonggekkk/argosbx/releases/download/argosbx/cert.crt
+command -v openssl >/dev/null 2>&1 && openssl ecparam -genkey -name prime256v1 -out /root/ygkkkcaz/private.key >/dev/null 2>&1
+command -v openssl >/dev/null 2>&1 && openssl req -new -x509 -days 36500 -key /root/ygkkkcaz/private.key -out /root/ygkkkcaz/cert.crt -subj "/CN=www.bing.com" >/dev/null 2>&1
+SHA256=$(openssl x509 -in /root/ygkkkcaz/cert.crt -outform DER | sha256sum | awk '{print $1}')
+echo "$SHA256" > /root/ygkkkcaz/SHA256.txt
 resinstall
 #[[ -e /etc/gai.conf ]] && grep -qE '^ *precedence ::ffff:0:0/96  100' /etc/gai.conf || echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf 2>/dev/null
 }
