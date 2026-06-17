@@ -274,6 +274,24 @@ fi
 green "x-ui登录根路径：${path}"
 }
 
+certinstall(){
+echo
+readp "设置 x-ui 登录方式（输入y，表示启用https登录方式，开始验证安装证书；回车跳过为继续使用http登录方式）：" cert
+if [[ -n $cert ]]; then
+if [[ ! -s /root/ygkkkca/cert.crt ]]; then
+acme
+fi
+if [[ -s /root/ygkkkca/cert.crt ]]; then
+webCertFile="/root/ygkkkca/cert.crt"
+webKeyFile="/root/ygkkkca/private.key"
+/usr/local/x-ui/x-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile" > /dev/null 2>&1
+green "经检测，已安装了证书，自动开启https登录方式"
+else
+yellow "经检测，未检测到证书，继续使用http方式登录"
+fi
+fi
+}
+
 showxuiip(){
 xuilogin(){
 v4v6
@@ -325,6 +343,7 @@ echo "----------------------------------------------------------------------"
 userinstall
 portinstall
 pathinstall
+certinstall
 mkdir -p /root/ygkkkcaz
 command -v openssl >/dev/null 2>&1 && openssl ecparam -genkey -name prime256v1 -out /root/ygkkkcaz/private.key >/dev/null 2>&1
 command -v openssl >/dev/null 2>&1 && openssl req -new -x509 -days 36500 -key /root/ygkkkcaz/private.key -out /root/ygkkkcaz/cert.crt -subj "/CN=www.bing.com" >/dev/null 2>&1
