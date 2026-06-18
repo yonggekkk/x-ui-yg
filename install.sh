@@ -398,6 +398,7 @@ kill -15 $(pgrep -f 'webxui' 2>/dev/null) >/dev/null 2>&1
 rm -rf /root/webxui /etc/local.d/alpinesub.start /usr/local/x-ui/ /etc/x-ui-yg/ /usr/bin/x-ui xuiyg_update ygkkkcaz
 uncronxui
 iptables -t nat -F PREROUTING >/dev/null 2>&1
+ip6tables -t nat -F PREROUTING >/dev/null 2>&1
 netfilter-persistent save >/dev/null 2>&1
 service iptables save >/dev/null 2>&1
 #sed -i '/^precedence ::ffff:0:0\/96  100/d' /etc/gai.conf 2>/dev/null
@@ -735,8 +736,6 @@ fi
 hyjpport(){
 readp "指定已设置的Hysteria2协议的主端口：" hyport
 readp "设置该主端口转发的跳跃端口【格式：20000-50000,12345】：" hyjpt
-iptables -t nat -F PREROUTING >/dev/null 2>&1
-ip6tables -t nat -F PREROUTING >/dev/null 2>&1
 for p in ${hyjpt//,/ }; do
 iptables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || iptables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
 ip6tables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || ip6tables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
