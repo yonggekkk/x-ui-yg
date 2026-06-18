@@ -279,7 +279,7 @@ echo
 readp "设置 x-ui 登录方式（输入y，表示启用https登录方式，开始验证安装证书；回车跳过为继续使用http登录方式）：" cert
 if [[ -n $cert ]]; then
 if [[ ! -s /root/ygkkkca/cert.crt ]]; then
-acme
+bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/acme-yg/main/acme.sh)
 fi
 if [[ -s /root/ygkkkca/cert.crt ]]; then
 webCertFile="/root/ygkkkca/cert.crt"
@@ -406,7 +406,7 @@ echo
 green "x-ui已卸载完成"
 echo
 blue "欢迎继续使用x-ui-yg脚本：bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh)"
-echo
+exit
 else
 red "输入有误" && uninstall
 fi
