@@ -285,8 +285,10 @@ if [[ -s /root/ygkkkca/cert.crt ]]; then
 webCertFile="/root/ygkkkca/cert.crt"
 webKeyFile="/root/ygkkkca/private.key"
 /usr/local/x-ui/x-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile" > /dev/null 2>&1
+echo
 green "经检测，已安装了证书，自动开启https登录方式"
 else
+echo
 yellow "经检测，未检测到证书，继续使用http方式登录"
 fi
 fi
