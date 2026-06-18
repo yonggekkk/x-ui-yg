@@ -25,11 +25,8 @@
     },
      "levels": {
       "0": {
-        "handshake": 10,
-        "connIdle": 100,
-        "uplinkOnly": 2,
-        "downlinkOnly": 3,
-        "bufferSize": 10240  
+        "statsUserDownlink": true,
+        "statsUserUplink": true
       }
     }
   },
