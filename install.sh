@@ -734,12 +734,12 @@ fi
 
 hyjpport(){
 readp "指定已设置的Hysteria2协议的主端口：" hyport
-readp "设置该主端口转发的跳跃端口：" hyjpt
+readp "设置该主端口转发的跳跃端口【格式：20000-50000,12345】：" hyjpt
 iptables -t nat -F PREROUTING >/dev/null 2>&1
 ip6tables -t nat -F PREROUTING >/dev/null 2>&1
 for p in ${hyjpt//,/ }; do
-iptables -t nat -A PREROUTING -p udp --dport "${p/-/:}" -j DNAT --to-destination :$hyport
-ip6tables -t nat -A PREROUTING -p udp --dport "${p/-/:}" -j DNAT --to-destination :$hyport
+iptables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || iptables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
+ip6tables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || ip6tables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
 done
 netfilter-persistent save >/dev/null 2>&1
 if command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1; then
@@ -2899,7 +2899,7 @@ ym=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
 echo $ym > /root/ygkkkca/ca.log
 fi
 if [[ -f /root/ygkkkca/ca.log ]]; then
-echo -e "$blue登录地址(域名加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
+echo -e "$blue登录地址(域名或IP加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
 else
 echo -e "$sred强烈建议申请域名证书并开启域名(https)登录方式，以确保面板数据安全$plain"
 fi
