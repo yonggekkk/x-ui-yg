@@ -61,7 +61,7 @@ if [ ! -f xuiyg_update ]; then
 green "首次安装x-ui-yg脚本必要的依赖……"
 if [[ x"${release}" == x"alpine" ]]; then
 apk update
-apk add wget curl tar jq tzdata openssl expect git socat iproute2 coreutils util-linux dcron
+apk add wget curl tar jq iptables tzdata openssl busybox-extras expect git socat iproute2 coreutils util-linux 
 apk add virt-what
 else
 if [[ $release = Centos && ${vsid} =~ 8 ]]; then
@@ -75,13 +75,13 @@ fi
 
 if [ -x "$(command -v apt-get)" ]; then
 apt update -y
-apt install jq tzdata socat cron coreutils util-linux -y
+apt install jq tzdata socat cron busybox iptables-persistent coreutils util-linux -y
 elif [ -x "$(command -v yum)" ]; then
 yum update -y && yum install epel-release -y
-yum install jq tzdata socat coreutils util-linux -y
+yum install jq tzdata busybox socat coreutils util-linux -y
 elif [ -x "$(command -v dnf)" ]; then
 dnf update -y
-dnf install jq tzdata socat coreutils util-linux -y
+dnf install jq tzdata busybox socat coreutils util-linux -y
 fi
 if [ -x "$(command -v yum)" ] || [ -x "$(command -v dnf)" ]; then
 if ! command -v "cronie" &> /dev/null; then
@@ -274,6 +274,26 @@ fi
 green "x-ui登录根路径：${path}"
 }
 
+certinstall(){
+echo
+readp "设置 x-ui 登录方式（输入y，表示启用https登录方式，开始验证安装证书；回车跳过为继续使用http登录方式）：" cert
+if [[ -n $cert ]]; then
+if [[ ! -s /root/ygkkkca/cert.crt ]]; then
+bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/acme-yg/main/acme.sh)
+fi
+if [[ -s /root/ygkkkca/cert.crt ]]; then
+webCertFile="/root/ygkkkca/cert.crt"
+webKeyFile="/root/ygkkkca/private.key"
+/usr/local/x-ui/x-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile" > /dev/null 2>&1
+echo
+green "经检测，已安装了证书，自动开启https登录方式"
+else
+echo
+yellow "经检测，未检测到证书，继续使用http方式登录"
+fi
+fi
+}
+
 showxuiip(){
 xuilogin(){
 v4v6
@@ -325,9 +345,12 @@ echo "----------------------------------------------------------------------"
 userinstall
 portinstall
 pathinstall
+certinstall
 mkdir -p /root/ygkkkcaz
-curl -Ls -o /root/ygkkkcaz/private.key https://github.com/yonggekkk/argosbx/releases/download/argosbx/private.key
-curl -Ls -o /root/ygkkkcaz/cert.crt https://github.com/yonggekkk/argosbx/releases/download/argosbx/cert.crt
+command -v openssl >/dev/null 2>&1 && openssl ecparam -genkey -name prime256v1 -out /root/ygkkkcaz/private.key >/dev/null 2>&1
+command -v openssl >/dev/null 2>&1 && openssl req -new -x509 -days 36500 -key /root/ygkkkcaz/private.key -out /root/ygkkkcaz/cert.crt -subj "/CN=www.bing.com" >/dev/null 2>&1
+SHA256=$(openssl x509 -in /root/ygkkkcaz/cert.crt -outform DER | sha256sum | awk '{print $1}')
+echo "$SHA256" > /root/ygkkkcaz/SHA256.txt
 resinstall
 #[[ -e /etc/gai.conf ]] && grep -qE '^ *precedence ::ffff:0:0/96  100' /etc/gai.conf || echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf 2>/dev/null
 }
@@ -373,17 +396,19 @@ fi
 kill -15 $(cat /usr/local/x-ui/xuiargopid.log 2>/dev/null) >/dev/null 2>&1
 kill -15 $(cat /usr/local/x-ui/xuiargoympid.log 2>/dev/null) >/dev/null 2>&1
 kill -15 $(cat /usr/local/x-ui/xuiwpphid.log 2>/dev/null) >/dev/null 2>&1
-rm /usr/bin/x-ui -f
-rm /etc/x-ui-yg/ -rf
-rm /usr/local/x-ui/ -rf
+kill -15 $(pgrep -f 'webxui' 2>/dev/null) >/dev/null 2>&1
+rm -rf /root/webxui /etc/local.d/alpinesub.start /usr/local/x-ui/ /etc/x-ui-yg/ /usr/bin/x-ui xuiyg_update ygkkkcaz
 uncronxui
-rm -rf xuiyg_update ygkkkcaz
+iptables -t nat -F PREROUTING >/dev/null 2>&1
+ip6tables -t nat -F PREROUTING >/dev/null 2>&1
+netfilter-persistent save >/dev/null 2>&1
+service iptables save >/dev/null 2>&1
 #sed -i '/^precedence ::ffff:0:0\/96  100/d' /etc/gai.conf 2>/dev/null
 echo
 green "x-ui已卸载完成"
 echo
 blue "欢迎继续使用x-ui-yg脚本：bash <(curl -Ls https://raw.githubusercontent.com/yonggekkk/x-ui-yg/main/install.sh)"
-echo
+exit
 else
 red "输入有误" && uninstall
 fi
@@ -523,8 +548,8 @@ else
 if [[ ! -f /etc/systemd/system/x-ui.service ]]; then
 return 2
 fi
-temp=$(systemctl status x-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
-if [[ x"${temp}" == x"running" ]]; then
+temp=$(systemctl is-active x-ui 2>/dev/null | grep -w active)
+if [[ x"${temp}" == x"active" ]]; then
 return 0
 else
 return 1
@@ -692,7 +717,7 @@ fi
 
 changeserv(){
 echo
-readp "1：设置Argo临时、固定隧道\n2：设置vmess与vless节点在订阅链接中的优选IP地址\n3：设置Gitlab订阅分享链接\n4：获取warp-wireguard普通账号配置\n0：返回上层\n请选择【0-4】：" menu
+readp "1：设置Argo临时、固定隧道\n2：设置vmess与vless节点在订阅链接中的优选IP地址\n3：设置Gitlab订阅分享链接\n4：获取warp-wireguard普通账号配置\n5：设置Hysteria2协议多端口跳跃\n6：设置本地IP订阅分享链接\n0：返回上层\n请选择【0-6】：" menu
 if [ "$menu" = "1" ];then
 xuiargo
 elif [ "$menu" = "2" ];then
@@ -701,9 +726,111 @@ elif [ "$menu" = "3" ];then
 gitlabsub
 elif [ "$menu" = "4" ];then
 warpwg
+elif [ "$menu" = "5" ];then
+hyjpport
+elif [ "$menu" = "6" ];then
+ipsub
 else 
 show_menu
 fi
+}
+
+hyjpport(){
+readp "指定已设置的Hysteria2协议的主端口：" hyport
+readp "设置该主端口转发的跳跃端口【格式：20000-50000,12345】：" hyjpt
+for p in ${hyjpt//,/ }; do
+iptables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || iptables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
+ip6tables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || ip6tables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
+done
+netfilter-persistent save >/dev/null 2>&1
+if command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1; then
+rc-update show default 2>/dev/null | grep -q 'iptables' || rc-update add iptables >/dev/null 2>&1
+rc-update show default 2>/dev/null | grep -q 'ip6tables' || rc-update add ip6tables >/dev/null 2>&1
+rc-service iptables save >/dev/null 2>&1
+rc-service ip6tables save >/dev/null 2>&1
+fi
+sharesub_sbcl >/dev/null 2>&1
+green "已设置Hysteria2协议主端口 $hyport 转发的跳跃端口：$hyjpt"
+}
+
+ipsub(){
+subtokenipsub(){
+echo
+readp "输入订阅链接路径密码（回车表示xui面版登录根路径）：" menu
+if [ -z "$menu" ]; then
+subtoken="$(/usr/local/x-ui/x-ui setting -show 2>/dev/null | awk -F': ' 'NR==4{print $2}' | tr -d '/')"
+else
+subtoken="$menu"
+fi
+rm -rf /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"
+echo $subtoken > /usr/local/x-ui/subtoken.log
+green "订阅链接路径密码：$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"
+}
+subportipsub(){
+echo
+readp "输入未被占用且可用的订阅链接端口（回车表示随机端口）：" menu
+if [ -z "$menu" ]; then
+subport=$(shuf -i 10000-65535 -n 1)
+else
+subport="$menu"
+fi
+echo $subport > /usr/local/x-ui/subport.log
+green "订阅链接端口：$(cat /usr/local/x-ui/subport.log 2>/dev/null)"
+}
+echo
+yellow "1：重置安装本地IP订阅链接"
+yellow "2：更换订阅链接路径密码"
+yellow "3：更换订阅链接端口"
+yellow "4：卸载本地IP订阅链接"
+yellow "0：返回上层"
+readp "请选择【0-4】：" menu
+if [ "$menu" = "1" ]; then
+subtokenipsub && subportipsub
+elif [ "$menu" = "2" ];then
+subtokenipsub
+elif [ "$menu" = "3" ];then
+subportipsub
+elif [ "$menu" = "4" ];then
+kill -15 $(pgrep -f 'webxui' 2>/dev/null) >/dev/null 2>&1
+crontab -l 2>/dev/null > /tmp/crontab.tmp
+sed -i '/webxui/d' /tmp/crontab.tmp
+crontab /tmp/crontab.tmp >/dev/null 2>&1
+rm /tmp/crontab.tmp
+rm -rf /root/webxui
+rm -rf /etc/local.d/alpinesub.start
+green "本地IP订阅链接已卸载完成" && exit
+else
+changeserv
+fi
+echo
+green "请稍后…………"
+kill -15 $(pgrep -f 'webxui' 2>/dev/null) >/dev/null 2>&1
+mkdir -p /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"
+ln -sf /usr/local/x-ui/bin/clmi.yaml /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"/clmi.yaml
+ln -sf /usr/local/x-ui/bin/sbox.json /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"/sbox.json
+ln -sf /usr/local/x-ui/bin/jhsub.txt /root/webxui/"$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)"/jhsub.txt
+if command -v apk >/dev/null 2>&1; then
+busybox-extras httpd -f -p "$(cat /usr/local/x-ui/subport.log 2>/dev/null)" -h /root/webxui > /dev/null 2>&1 &
+else
+busybox httpd -f -p "$(cat /usr/local/x-ui/subport.log 2>/dev/null)" -h /root/webxui > /dev/null 2>&1 &
+fi
+sleep 5
+if command -v apk >/dev/null 2>&1; then
+cat > /etc/local.d/alpinesub.start <<'EOF'
+#!/bin/bash
+sleep 10
+busybox-extras httpd -f -p $(cat /usr/local/x-ui/subport.log 2>/dev/null) -h /root/webxui > /dev/null 2>&1 &
+EOF
+chmod +x /etc/local.d/alpinesub.start
+rc-update add local default >/dev/null 2>&1
+else
+crontab -l 2>/dev/null > /tmp/crontab.tmp
+sed -i '/webxui/d' /tmp/crontab.tmp
+echo '@reboot sleep 10 && /bin/bash -c "busybox httpd -f -p $(cat /usr/local/x-ui/subport.log 2>/dev/null) -h /root/webxui > /dev/null 2>&1 &"' >> /tmp/crontab.tmp
+crontab /tmp/crontab.tmp >/dev/null 2>&1
+rm /tmp/crontab.tmp
+fi
+sharesub_sbcl >/dev/null 2>&1 && green "本地IP订阅链接已更新完成" && sleep 2 && x-ui
 }
 
 warpwg(){
@@ -810,7 +937,7 @@ echo "$!" > /usr/local/x-ui/xuiargopid.log
 sleep 20
 if [[ -n $(curl -sL https://$(cat /usr/local/x-ui/argo.log 2>/dev/null | grep -a trycloudflare.com | awk 'NR==2{print}' | awk -F// '{print $2}' | awk '{print $1}')/ -I | awk 'NR==1 && /404|400|503/') ]]; then
 argo=$(cat /usr/local/x-ui/argo.log 2>/dev/null | grep -a trycloudflare.com | awk 'NR==2{print}' | awk -F// '{print $2}' | awk '{print $1}')
-blue "Argo隧道申请成功，域名验证有效：$argo" && sleep 2
+blue "Argo隧道申请成功，域名验证有效：$argo"
 break
 fi
 if [ $i -eq 5 ]; then
@@ -827,6 +954,7 @@ crontab -l 2>/dev/null > /tmp/crontab.tmp
 echo '@reboot sleep 10 && /bin/bash -c "/usr/local/x-ui/cloudflared tunnel --url http://localhost:$(cat /usr/local/x-ui/xuiargoport.log) --edge-ip-version auto --no-autoupdate --protocol http2 > /usr/local/x-ui/argo.log 2>&1 & pid=\$! && echo \$pid > /usr/local/x-ui/xuiargopid.log"' >> /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
+sharesub_sbcl >/dev/null 2>&1
 elif [ "$menu" = "2" ]; then
 kill -15 $(cat /usr/local/x-ui/xuiargopid.log 2>/dev/null) >/dev/null 2>&1
 rm -rf /usr/local/x-ui/argo.log /usr/local/x-ui/xuiargopid.log /usr/local/x-ui/xuiargoport.log
@@ -835,6 +963,7 @@ sed -i '/xuiargopid.log/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 green "已卸载Argo临时隧道"
+sharesub_sbcl >/dev/null 2>&1
 else
 xuiargo
 fi
@@ -875,6 +1004,7 @@ crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 argo=$(cat /usr/local/x-ui/xuiargoym.log 2>/dev/null)
 blue "Argo固定隧道设置完成，固定域名：$argo"
+sharesub_sbcl >/dev/null 2>&1
 elif [ "$menu" = "2" ]; then
 kill -15 $(cat /usr/local/x-ui/xuiargoympid.log 2>/dev/null) >/dev/null 2>&1
 rm -rf /usr/local/x-ui/xuiargoym.log /usr/local/x-ui/xuiargoymport.log /usr/local/x-ui/xuiargoympid.log /usr/local/x-ui/xuiargotoken.log
@@ -883,6 +1013,7 @@ sed -i '/xuiargoympid/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
 rm /tmp/crontab.tmp
 green "已卸载Argo固定隧道"
+sharesub_sbcl >/dev/null 2>&1
 else
 xuiargo
 fi
@@ -909,12 +1040,12 @@ red "如果VPS不支持以上13个CF标准端口（NAT类VPS），请在CF规则
 echo
 readp "输入自定义的优选IP/域名 (回车跳过表示恢复本地IP直连)：" menu
 [[ -z "$menu" ]] && > /usr/local/x-ui/bin/xuicdnip_ws.txt || echo "$menu" > /usr/local/x-ui/bin/xuicdnip_ws.txt
-green "设置成功，可选择7刷新" && sleep 2 && show_menu
+green "设置成功，可选择7刷新" && sharesub_sbcl >/dev/null 2>&1 && show_menu
 elif [ "$menu" = "2" ]; then
 red "请确保Argo临时隧道或者固定隧道的节点功能已启用" && sleep 2
 readp "输入自定义的优选IP/域名 (回车跳过表示用默认优选域名：www.visa.com.sg)：" menu
 [[ -z "$menu" ]] && > /usr/local/x-ui/bin/xuicdnip_argo.txt || echo "$menu" > /usr/local/x-ui/bin/xuicdnip_argo.txt
-green "设置成功，可选择7刷新" && sleep 2 && show_menu
+green "设置成功，可选择7刷新" && sharesub_sbcl >/dev/null 2>&1 && show_menu
 else
 changeserv
 fi
@@ -951,7 +1082,7 @@ fi
 echo "$token" > /usr/local/x-ui/bin/gitlabtoken.txt
 rm -rf /usr/local/x-ui/bin/.git
 git init >/dev/null 2>&1
-git add xui_singbox.json xui_clashmeta.yaml xui_ty.txt>/dev/null 2>&1
+git add sbox.json clmi.yaml jhsub.txt>/dev/null 2>&1
 git config --global user.email "${email}" >/dev/null 2>&1
 git config --global user.name "${userid}" >/dev/null 2>&1
 git commit -m "commit_add_$(date +"%F %T")" >/dev/null 2>&1
@@ -970,9 +1101,9 @@ interact
 EOF
 chmod +x gitpush.sh
 ./gitpush.sh "git push -f origin main${gitlab_ml}" cat /usr/local/x-ui/bin/gitlabtoken.txt >/dev/null 2>&1
-echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/xui_singbox.json/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/sing_box_gitlab.txt
-echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/xui_clashmeta.yaml/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/clash_meta_gitlab.txt
-echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/xui_ty.txt/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/xui_ty_gitlab.txt
+echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/sbox.json/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/sing_box_gitlab.txt
+echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/clmi.yaml/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/clash_meta_gitlab.txt
+echo "https://gitlab.com/api/v4/projects/${userid}%2F${project}/repository/files/jhsub.txt/raw?ref=${git_sk}&private_token=${token}" > /usr/local/x-ui/bin/xui_ty_gitlab.txt
 sharesubshow
 else
 yellow "设置Gitlab订阅链接失败，请反馈"
@@ -1023,9 +1154,9 @@ if [[ $(ls -a | grep '^\.git$') ]]; then
 if [ -f /usr/local/x-ui/bin/gitlab_ml_ml ]; then
 gitlab_ml=$(cat /usr/local/x-ui/bin/gitlab_ml_ml)
 fi
-git rm --cached xui_singbox.json xui_clashmeta.yaml xui_ty.txt >/dev/null 2>&1
+git rm --cached sbox.json clmi.yaml jhsub.txt >/dev/null 2>&1
 git commit -m "commit_rm_$(date +"%F %T")" >/dev/null 2>&1
-git add xui_singbox.json xui_clashmeta.yaml xui_ty.txt >/dev/null 2>&1
+git add sbox.json clmi.yaml jhsub.txt >/dev/null 2>&1
 git commit -m "commit_add_$(date +"%F %T")" >/dev/null 2>&1
 chmod +x gitpush.sh
 ./gitpush.sh "git push -f origin main${gitlab_ml}" cat /usr/local/x-ui/bin/gitlabtoken.txt >/dev/null 2>&1
@@ -1037,25 +1168,25 @@ cd
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 red "🚀X-UI聚合通用节点分享链接显示如下："
-red "文件目录 /usr/local/x-ui/bin/xui_ty.txt ，可直接在客户端剪切板导入添加" && sleep 2
+red "文件目录 /usr/local/x-ui/bin/jhsub.txt ，可直接在客户端剪切板导入添加" && sleep 2
 echo
-cat /usr/local/x-ui/bin/xui_ty.txt
+cat /usr/local/x-ui/bin/jhsub.txt
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 red "🚀X-UI-Clash-Meta配置文件操作如下："
-red "文件目录 /usr/local/x-ui/bin/xui_clashmeta.yaml ，复制自建以yaml文件格式为准" 
+red "文件目录 /usr/local/x-ui/bin/clmi.yaml ，复制自建以yaml文件格式为准" 
 echo
-red "输入：cat /usr/local/x-ui/bin/xui_clashmeta.yaml 即可显示配置内容" && sleep 2
+red "输入：cat /usr/local/x-ui/bin/clmi.yaml 即可显示配置内容" && sleep 2
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 red "🚀XUI-Sing-box-SFA/SFI/SFW配置文件操作如下："
-red "文件目录 /usr/local/x-ui/bin/xui_singbox.json ，复制自建以json文件格式为准"
+red "文件目录 /usr/local/x-ui/bin/sbox.json ，复制自建以json文件格式为准"
 echo
-red "输入：cat /usr/local/x-ui/bin/xui_singbox.json 即可显示配置内容" && sleep 2
+red "输入：cat /usr/local/x-ui/bin/sbox.json 即可显示配置内容" && sleep 2
 echo
 white "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo
@@ -1068,115 +1199,162 @@ else
 cdnargo=www.visa.com.sg
 fi
 green "请稍等……"
-xip1=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 1p)
-if [[ "$xip1" =~ : ]]; then
-dnsip='tls://[2001:4860:4860::8888]/dns-query'
-else
-dnsip='tls://8.8.8.8/dns-query'
-fi
-cat > /usr/local/x-ui/bin/xui_singbox.json <<EOF
+cat > /usr/local/x-ui/bin/sbox.json <<EOF
 {
-  "log": {
-    "disabled": false,
-    "level": "info",
-    "timestamp": true
-  },
-  "experimental": {
-    "clash_api": {
-      "external_controller": "127.0.0.1:9090",
-      "external_ui": "ui",
-      "external_ui_download_url": "",
-      "external_ui_download_detour": "",
-      "secret": "",
-      "default_mode": "Rule"
-       },
-      "cache_file": {
+    "log": {
+        "disabled": false,
+        "level": "info",
+        "timestamp": true
+    },
+    "experimental": {
+        "cache_file": {
             "enabled": true,
-            "path": "cache.db",
+            "path": "./cache.db",
             "store_fakeip": true
+        },
+        "clash_api": {
+            "external_controller": "127.0.0.1:9090",
+            "external_ui": "ui",
+            "default_mode": "Rule"
         }
     },
     "dns": {
         "servers": [
             {
-                "tag": "proxydns",
-                "address": "$dnsip",
-                "detour": "select"
+                "tag": "aliDns",
+                "type": "https",
+                "server": "dns.alidns.com",
+                "path": "/dns-query",
+                "domain_resolver": "local"
             },
             {
-                "tag": "localdns",
-                "address": "h3://223.5.5.5/dns-query",
-                "detour": "direct"
+                "tag": "local",
+                "type": "udp",
+                "server": "223.5.5.5"
             },
             {
-                "tag": "dns_fakeip",
-                "address": "fakeip"
-            }
+                "tag": "proxyDns",
+                "type": "https",
+                "server": "dns.google",
+                "path": "/dns-query",
+	            "domain_resolver": "aliDns",
+                "detour": "proxy"
+            },
+           {
+        "type": "fakeip",
+        "tag": "fakeip",
+        "inet4_range": "198.18.0.0/15",
+        "inet6_range": "fc00::/18"
+      }
         ],
         "rules": [
             {
-                "outbound": "any",
-                "server": "localdns",
-                "disable_cache": true
-            },
-            {
-                "clash_mode": "Global",
-                "server": "proxydns"
+                "rule_set": "geosite-cn",
+                "clash_mode": "Rule",
+                "server": "aliDns"
             },
             {
                 "clash_mode": "Direct",
-                "server": "localdns"
+                "server": "local"
             },
             {
-                "rule_set": "geosite-cn",
-                "server": "localdns"
+                "clash_mode": "Global",
+                "server": "proxyDns"
             },
             {
-                 "rule_set": "geosite-geolocation-!cn",
-                 "server": "proxydns"
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "server": "fakeip"
+      }
+        ],
+        "final": "proxyDns",
+        "strategy": "prefer_ipv4"
+    },
+    "inbounds": [
+        {
+            "type": "tun",
+            "tag": "tun-in",
+            "address": [
+                "172.19.0.1/30",
+                "fd00::1/126"
+            ],
+            "auto_route": true,
+            "strict_route": true
+        }
+    ],
+    "route": {
+        "rules": [
+            {
+	           "inbound": "tun-in",
+                "action": "sniff"
             },
-             {
-                "rule_set": "geosite-geolocation-!cn",         
-                "query_type": [
-                    "A",
-                    "AAAA"
+            {
+                "type": "logical",
+                "mode": "or",
+                "rules": [
+                    {
+                        "port": 53
+                    },
+                    {
+                        "protocol": "dns"
+                    }
                 ],
-                "server": "dns_fakeip"
-            }
-          ],
-           "fakeip": {
-           "enabled": true,
-           "inet4_range": "198.18.0.0/15",
-           "inet6_range": "fc00::/18"
+                "action": "hijack-dns"
+            },
+         {
+          "clash_mode": "Global",
+          "outbound": "proxy"
          },
-          "independent_cache": true,
-          "final": "proxydns"
-        },
-      "inbounds": [
-    {
-      "type": "tun",
-      "tag": "tun-in",
-      "address": [
-      "172.19.0.1/30",
-      "fd00::1/126"
-      ],
-      "auto_route": true,
-      "strict_route": true,
-      "sniff": true,
-      "sniff_override_destination": true,
-      "domain_strategy": "prefer_ipv4"
-    }
-  ],
+        {
+        "rule_set": "geosite-cn",
+        "clash_mode": "Rule",
+        "outbound": "direct"
+       },
+     {
+    "rule_set": "geoip-cn",
+    "clash_mode": "Rule",
+    "outbound": "direct"
+      },
+     {
+    "ip_is_private": true,
+    "clash_mode": "Rule",
+    "outbound": "direct"
+    },
+     {
+      "clash_mode": "Direct",
+      "outbound": "direct"
+     }		
+        ],
+        "rule_set": [
+            {
+                "tag": "geosite-cn",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-cn.srs",
+                "download_detour": "direct"
+            },
+            {
+                "tag": "geoip-cn",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+                "download_detour": "direct"
+            }
+        ],
+        "final": "proxy",
+        "auto_detect_interface": true,
+        "default_domain_resolver": {
+            "server": "aliDns"
+        }
+    },
   "outbounds": [
 
 //_0
 
     {
-      "tag": "direct",
-      "type": "direct"
-    },
-    {
-      "tag": "select",
+      "tag": "proxy",
       "type": "selector",
       "default": "auto",
       "outbounds": [
@@ -1193,119 +1371,55 @@ cat > /usr/local/x-ui/bin/xui_singbox.json <<EOF
 
 //_2
 
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "1m",
-      "tolerance": 50,
-      "interrupt_exist_connections": false
+       ],
+       "url": "http://www.gstatic.com/generate_204",
+       "interval": "10m",
+        "tolerance": 50
+        },
+    {
+      "tag": "direct",
+      "type": "direct"
     }
-  ],
-  "route": {
-      "rule_set": [
-            {
-                "tag": "geosite-geolocation-!cn",
-                "type": "remote",
-                "format": "binary",
-                "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
-                "download_detour": "select",
-                "update_interval": "1d"
-            },
-            {
-                "tag": "geosite-cn",
-                "type": "remote",
-                "format": "binary",
-                "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-cn.srs",
-                "download_detour": "select",
-                "update_interval": "1d"
-            },
-            {
-                "tag": "geoip-cn",
-                "type": "remote",
-                "format": "binary",
-                "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
-                "download_detour": "select",
-                "update_interval": "1d"
-            }
-        ],
-    "auto_detect_interface": true,
-    "final": "select",
-    "rules": [
-      {
-      "inbound": "tun-in",
-      "action": "sniff"
-      },
-      {
-      "protocol": "dns",
-      "action": "hijack-dns"
-      },
-      {
-      "port": 443,
-      "network": "udp",
-      "action": "reject"
-      },
-      {
-        "clash_mode": "Direct",
-        "outbound": "direct"
-      },
-      {
-        "clash_mode": "Global",
-        "outbound": "select"
-      },
-      {
-        "rule_set": "geoip-cn",
-        "outbound": "direct"
-      },
-      {
-        "rule_set": "geosite-cn",
-        "outbound": "direct"
-      },
-      {
-      "ip_is_private": true,
-      "outbound": "direct"
-      },
-      {
-        "rule_set": "geosite-geolocation-!cn",
-        "outbound": "select"
-      }
     ]
-  },
-    "ntp": {
-    "enabled": true,
-    "server": "time.apple.com",
-    "server_port": 123,
-    "interval": "30m",
-    "detour": "direct"
-  }
 }
 EOF
 
-cat > /usr/local/x-ui/bin/xui_clashmeta.yaml <<EOF
+cat > /usr/local/x-ui/bin/clmi.yaml <<EOF
 port: 7890
 allow-lan: true
 mode: rule
 log-level: info
 unified-delay: true
-global-client-fingerprint: chrome
 dns:
-  enable: false
-  listen: :53
+  enable: true 
+  listen: "0.0.0.0:1053"
   ipv6: true
-  enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
-  default-nameserver: 
-    - 223.5.5.5
-    - 8.8.8.8
+  prefer-h3: false
+  respect-rules: true
+  use-system-hosts: false
+  cache-algorithm: "arc"
+  enhanced-mode: "fake-ip"
+  fake-ip-range: "198.18.0.1/16"
+  fake-ip-filter:
+    - "+.lan"
+    - "+.local"
+    - "+.msftconnecttest.com"
+    - "+.msftncsi.com"
+    - "localhost.ptlogin2.qq.com"
+    - "localhost.sec.qq.com"
+    - "+.in-addr.arpa"
+    - "+.ip6.arpa"
+    - "time.*.com"
+    - "time.*.gov"
+    - "pool.ntp.org"
+    - "localhost.work.weixin.qq.com"
+  default-nameserver: ["223.5.5.5", "119.29.29.29"]
   nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-  fallback:
-    - https://1.0.0.1/dns-query
-    - tls://dns.google
-  fallback-filter:
-    geoip: true
-    geoip-code: CN
-    ipcidr:
-      - 240.0.0.0/4
+    - "https://1.1.1.1/dns-query"
+    - "https://8.8.8.8/dns-query"
+  proxy-server-nameserver:
+    - "https://223.5.5.5/dns-query"
+    - "https://doh.pub/dns-query"
 
 proxies:
 
@@ -1347,29 +1461,99 @@ rules:
 EOF
 
 xui_sb_cl(){
-sed -i "/#_0/r /usr/local/x-ui/bin/cl${i}.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - $tag" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - $tag" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - $tag" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sb${i}.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"$tag\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"$tag\"," /usr/local/x-ui/bin/xui_singbox.json
+sed -i "/#_0/r /usr/local/x-ui/bin/cl${i}.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - $tag" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - $tag" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - $tag" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sb${i}.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"$tag\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"$tag\"," /usr/local/x-ui/bin/sbox.json
 }
 
-tag_count=$(jq '.inbounds | map(select(.protocol == "vless" or .protocol == "vmess" or .protocol == "trojan" or .protocol == "shadowsocks")) | length' /usr/local/x-ui/bin/config.json)
-for ((i=0; i<tag_count; i++))
-do
-jq -c ".inbounds | map(select(.protocol == \"vless\" or .protocol == \"vmess\" or .protocol == \"trojan\" or .protocol == \"shadowsocks\"))[$i]" /usr/local/x-ui/bin/config.json > "/usr/local/x-ui/bin/$((i+1)).log"
+inbounds=$(jq '.inbounds | map(select(.protocol == "hysteria" or .protocol == "vless" or .protocol == "vmess" or .protocol == "trojan" or .protocol == "shadowsocks"))' /usr/local/x-ui/bin/config.json)
+tag_count=$(echo "$inbounds" | jq 'length')
+for ((i=0; i<tag_count; i++)); do
+echo "$inbounds" | jq -c ".[$i]" > "/usr/local/x-ui/bin/$((i+1)).log"
 done
-rm -rf /usr/local/x-ui/bin/ty.txt
+
+rm -rf /usr/local/x-ui/bin/jhsub.txt
 xip1=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 1p)
 ymip=$(cat /root/ygkkkca/ca.log 2>/dev/null)
 directory="/usr/local/x-ui/bin/"
 for i in $(seq 1 $tag_count); do
 file="${directory}${i}.log"
 if [ -f "$file" ]; then
+#hysteria
+if grep -q "hysteria" "$file"; then
+[[ -n $ymip ]] && servip=$ymip || servip=$xip1
+tls=$(jq -r '.streamSettings.tlsSettings.serverName' /usr/local/x-ui/bin/${i}.log)
+if [[ -n $tls ]]; then
+hy2_ins=false 
+hy2_name=$tls
+else
+SHA256=$(openssl x509 -in /root/ygkkkcaz/cert.crt -outform DER | sha256sum | awk '{print $1}')
+hy2_ins=true 
+hy2_name=www.bing.com
+fi
+uuid=$(jq -r '.settings.clients[0].auth' /usr/local/x-ui/bin/${i}.log)
+hy2_port=$(jq -r '.port' /usr/local/x-ui/bin/${i}.log)
+tag=$hy2_port-hy2
+hy2_ports=$(iptables -t nat -nL --line 2>/dev/null | grep -w "$hy2_port" | awk '{print $8}' | sed 's/dpts://; s/dpt://' | tr '\n' ',' | sed 's/,$//')
+if [[ -n $hy2_ports ]]; then
+cmhy2pt=$(echo $hy2_ports | tr ':' '-')
+hyps="&mport=$cmhy2pt"
+sbhy2pt=$(echo "$hy2_ports" | grep -o '[0-9]\+:[0-9]\+' | sed 's/.*/"&"/' | paste -sd,)
+else
+hyps=
+fi
+sbhy2ports(){
+if [[ -n $hy2_ports ]]; then
+    cat <<EOF
+  "server_ports": [ $sbhy2pt ],
+EOF
+fi
+}
+
+cat > /usr/local/x-ui/bin/sb${i}.log <<EOF
+
+    {
+        "type": "hysteria2",
+        "tag": "$tag",
+        "server": "$servip",
+        "server_port": $hy2_port,
+$(sbhy2ports)
+        "password": "$uuid",
+        "tls": {
+            "enabled": true,
+            "server_name": "$hy2_name",
+            "insecure": $hy2_ins,
+            "alpn": [
+                "h3"
+            ]
+        }
+    },
+EOF
+
+cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
+
+- name: $tag                            
+  type: hysteria2                                      
+  server: $servip                               
+  port: $hy2_port
+  ports: $cmhy2pt
+  password: $uuid                          
+  alpn:
+    - h3
+  sni: $hy2_name                               
+  skip-cert-verify: $hy2_ins
+  fast-open: true
+
+EOF
+echo "hysteria2://$uuid@$servip:$hy2_port?security=tls&alpn=h3&insecure=0&allowInsecure=0$hyps&sni=$hy2_name&pinSHA256=$SHA256#$tag" >>/usr/local/x-ui/bin/jhsub.txt
+xui_sb_cl
+
 #vless-reality-vision
-if grep -q "vless" "$file" && grep -q "reality" "$file" && grep -q "vision" "$file"; then
+elif ! grep -q "selectedAuth" "$file" && ! grep -q "xhttp" "$file" && grep -q "vless" "$file" && grep -q "reality" "$file" && grep -q "vision" "$file"; then
 finger=$(jq -r '.streamSettings.realitySettings.fingerprint' /usr/local/x-ui/bin/${i}.log)
 vl_name=$(jq -r '.streamSettings.realitySettings.serverNames[0]' /usr/local/x-ui/bin/${i}.log)
 public_key=$(jq -r '.streamSettings.realitySettings.publicKey' /usr/local/x-ui/bin/${i}.log)
@@ -1406,7 +1590,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
 
 - name: $tag               
   type: vless
-  server: $xip1                           
+  server: $xip1                         
   port: $vl_port                                
   uuid: $uuid   
   network: tcp
@@ -1420,11 +1604,11 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   client-fingerprint: $finger   
 
 EOF
-echo "vless://$uuid@$xip1:$vl_port?type=tcp&security=reality&sni=$vl_name&pbk=$public_key&flow=xtls-rprx-vision&sid=$short_id&fp=$finger#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "vless://$uuid@$xip1:$vl_port?type=tcp&security=reality&sni=$vl_name&pbk=$public_key&flow=xtls-rprx-vision&sid=$short_id&fp=$finger#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vless-tcp-vision
-elif grep -q "vless" "$file" && grep -q "vision" "$file" && grep -q "keyFile" "$file"; then
+elif ! grep -q "selectedAuth" "$file" && ! grep -q "xhttp" "$file" && grep -q "vless" "$file" && grep -q "vision" "$file" && grep -q "keyFile" "$file"; then
 [[ -n $ymip ]] && servip=$ymip || servip=$xip1
 uuid=$(jq -r '.settings.clients[0].id' /usr/local/x-ui/bin/${i}.log)
 vl_port=$(jq -r '.port' /usr/local/x-ui/bin/${i}.log)
@@ -1459,11 +1643,11 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
 
 
 EOF
-echo "vless://$uuid@$servip:$vl_port?type=tcp&security=tls&flow=xtls-rprx-vision#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "vless://$uuid@$servip:$vl_port?type=tcp&security=tls&flow=xtls-rprx-vision#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vless-ws
-elif grep -q "vless" "$file" && grep -q "ws" "$file" && ! grep -qw "{}}}" "$file"; then
+elif ! grep -q "selectedAuth" "$file" && ! grep -q "xhttp" "$file" && grep -q "vless" "$file" && grep -q "ws" "$file" && ! grep -qw "{}}}" "$file"; then
 ws_path=$(jq -r '.streamSettings.wsSettings.path' /usr/local/x-ui/bin/${i}.log)
 tls=$(jq -r '.streamSettings.security' /usr/local/x-ui/bin/${i}.log)
 vl_port=$(jq -r '.port' /usr/local/x-ui/bin/${i}.log)
@@ -1492,8 +1676,6 @@ else
 fi
 vl_name=$(jq -r '.streamSettings.wsSettings.headers.Host' /usr/local/x-ui/bin/${i}.log)
 uuid=$(jq -r '.settings.clients[0].id' /usr/local/x-ui/bin/${i}.log)
-
-
 
 cat > /usr/local/x-ui/bin/sb${i}.log <<EOF
 
@@ -1542,7 +1724,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
       Host: $vl_name 
 
 EOF
-echo "vless://$uuid@$servip:$vl_port?type=ws&security=$tlsw&sni=$vl_name&path=$ws_path&host=$vl_name#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "vless://$uuid@$servip:$vl_port?type=ws&security=$tlsw&sni=$vl_name&path=$ws_path&host=$vl_name#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vmess-ws
@@ -1625,7 +1807,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
       Host: $vm_name
 
 EOF
-echo -e "vmess://$(echo '{"add":"'$servip'","aid":"0","host":"'$vm_name'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"'$vm_port'","ps":"'$tag'","tls":"'$tlsw'","sni":"'$vm_name'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
+echo -e "vmess://$(echo '{"add":"'$servip'","aid":"0","host":"'$vm_name'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"'$vm_port'","ps":"'$tag'","tls":"'$tlsw'","sni":"'$vm_name'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vmess-tcp
@@ -1676,11 +1858,11 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   tls: $tls
 
 EOF
-echo -e "vmess://$(echo '{"add":"'$servip'","aid":"0","id":"'$uuid'","net":"tcp","port":"'$vm_port'","ps":"'$tag'","tls":"'$tlst'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
+echo -e "vmess://$(echo '{"add":"'$servip'","aid":"0","id":"'$uuid'","net":"tcp","port":"'$vm_port'","ps":"'$tag'","tls":"'$tlst'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #vless-tcp
-elif grep -q "vless" "$file" && grep -q "tcp" "$file"; then
+elif ! grep -q "selectedAuth" "$file" && ! grep -q "xhttp" "$file" && grep -q "vless" "$file" && grep -q "tcp" "$file"; then
 [[ -n $ymip ]] && servip=$ymip || servip=$xip1
 tls=$(jq -r '.streamSettings.security' /usr/local/x-ui/bin/${i}.log)
 if [[ $tls == 'tls' ]]; then
@@ -1724,7 +1906,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   tls: $tls
 
 EOF
-echo "vless://$uuid@$servip:$vl_port?type=tcp&security=$tlst#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "vless://$uuid@$servip:$vl_port?type=tcp&security=$tlst#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #trojan-tcp-tls
@@ -1760,7 +1942,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   skip-cert-verify: false
 
 EOF
-echo "trojan://$password@$servip:$vl_port?security=tls&type=tcp#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "trojan://$password@$servip:$vl_port?security=tls&type=tcp#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #trojan-ws-tls
@@ -1814,7 +1996,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
       Host: $vm_name
 
 EOF
-echo "trojan://$password@$servip:$vl_port?security=tls&type=ws&path=$ws_path&host=$vm_name#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo "trojan://$password@$servip:$vl_port?security=tls&type=ws&path=$ws_path&host=$vm_name#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 
 #shadowsocks-tcp
@@ -1847,7 +2029,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   udp: true
 
 EOF
-echo -e "ss://$ssmethod:$password@$servip:$vm_port#$tag" >>/usr/local/x-ui/bin/ty.txt
+echo -e "ss://$ssmethod:$password@$servip:$vm_port#$tag" >>/usr/local/x-ui/bin/jhsub.txt
 xui_sb_cl
 fi
 else
@@ -1960,22 +2142,22 @@ cat > /usr/local/x-ui/bin/clvlargo.log <<EOF
       Host: $argolsym 
 
 EOF
-sed -i "/#_0/r /usr/local/x-ui/bin/clvltargo.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_0/r /usr/local/x-ui/bin/clvlargo.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvltargo.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vl-tls-argo临时-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vl-tls-argo临时-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvlargo.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vl-argo临时-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vl-argo临时-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-echo "vless://$uuid@$cdnargo:8880?type=ws&security=none&path=$ws_path&host=$argolsym#vl-argo临时-8880" >>/usr/local/x-ui/bin/ty.txt
-echo "vless://$uuid@$cdnargo:8443?type=ws&security=tls&path=$ws_path&host=$argolsym#vl-tls-argo临时-8443" >>/usr/local/x-ui/bin/ty.txt
+sed -i "/#_0/r /usr/local/x-ui/bin/clvltargo.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vl-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_0/r /usr/local/x-ui/bin/clvlargo.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vl-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvltargo.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vl-tls-argo临时-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vl-tls-argo临时-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvlargo.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vl-argo临时-8880\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vl-argo临时-8880\"," /usr/local/x-ui/bin/sbox.json
+echo "vless://$uuid@$cdnargo:8880?type=ws&security=none&path=$ws_path&host=$argolsym#vl-argo临时-8880" >>/usr/local/x-ui/bin/jhsub.txt
+echo "vless://$uuid@$cdnargo:8443?type=ws&security=tls&path=$ws_path&host=$argolsym#vl-tls-argo临时-8443" >>/usr/local/x-ui/bin/jhsub.txt
 
 elif [[ $argoprotocol = vmess ]]; then
 #vmess-ws-tls-argo临时
@@ -2081,22 +2263,22 @@ cat > /usr/local/x-ui/bin/clvmargo.log <<EOF
       Host: $argolsym
 
 EOF
-sed -i "/#_0/r /usr/local/x-ui/bin/clvmtargo.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_0/r /usr/local/x-ui/bin/clvmargo.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmtargo.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vm-tls-argo临时-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vm-tls-argo临时-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmargo.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vm-argo临时-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vm-argo临时-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argolsym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8880","ps":"vm-argo临时-8880","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
-echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argolsym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8443","ps":"vm-tls-argo临时-8443","tls":"tls","sni":"'$argolsym'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
+sed -i "/#_0/r /usr/local/x-ui/bin/clvmtargo.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vm-tls-argo临时-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_0/r /usr/local/x-ui/bin/clvmargo.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vm-argo临时-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmtargo.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vm-tls-argo临时-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vm-tls-argo临时-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmargo.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vm-argo临时-8880\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vm-argo临时-8880\"," /usr/local/x-ui/bin/sbox.json
+echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argolsym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8880","ps":"vm-argo临时-8880","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
+echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argolsym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8443","ps":"vm-tls-argo临时-8443","tls":"tls","sni":"'$argolsym'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
 fi
 fi
 
@@ -2204,22 +2386,22 @@ cat > /usr/local/x-ui/bin/clvlargoym.log <<EOF
       Host: $argoym 
 
 EOF
-sed -i "/#_0/r /usr/local/x-ui/bin/clvltargoym.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_0/r /usr/local/x-ui/bin/clvlargoym.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvltargoym.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vl-tls-argo固定-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vl-tls-argo固定-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvlargoym.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vl-argo固定-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vl-argo固定-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-echo "vless://$uuid@$cdnargo:8880?type=ws&security=none&path=$ws_path&host=$argoym#vl-argo临时-8880" >>/usr/local/x-ui/bin/ty.txt
-echo "vless://$uuid@$cdnargo:8443?type=ws&security=tls&path=$ws_path&host=$argoym#vl-tls-argo临时-8443" >>/usr/local/x-ui/bin/ty.txt
+sed -i "/#_0/r /usr/local/x-ui/bin/clvltargoym.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vl-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_0/r /usr/local/x-ui/bin/clvlargoym.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vl-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvltargoym.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vl-tls-argo固定-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vl-tls-argo固定-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvlargoym.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vl-argo固定-8880\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vl-argo固定-8880\"," /usr/local/x-ui/bin/sbox.json
+echo "vless://$uuid@$cdnargo:8880?type=ws&security=none&path=$ws_path&host=$argoym#vl-argo临时-8880" >>/usr/local/x-ui/bin/jhsub.txt
+echo "vless://$uuid@$cdnargo:8443?type=ws&security=tls&path=$ws_path&host=$argoym#vl-tls-argo临时-8443" >>/usr/local/x-ui/bin/jhsub.txt
 
 elif [[ $argoprotocol = vmess ]]; then
 #vmess-ws-tls-argo固定
@@ -2325,33 +2507,33 @@ cat > /usr/local/x-ui/bin/clvmargoym.log <<EOF
       Host: $argoym
 
 EOF
-sed -i "/#_0/r /usr/local/x-ui/bin/clvmtargoym.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_0/r /usr/local/x-ui/bin/clvmargoym.log" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_1/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_2/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/#_3/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/xui_clashmeta.yaml
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmtargoym.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vm-tls-argo固定-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vm-tls-argo固定-8443\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmargoym.log" /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_1/ i\\ \"vm-argo固定-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-sed -i "/\/\/_2/ i\\ \"vm-argo固定-8880\"," /usr/local/x-ui/bin/xui_singbox.json
-echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argoym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8880","ps":"vm-argo固定-8880","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
-echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argoym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8443","ps":"vm-tls-argo固定-8443","tls":"tls","sni":"'$argoym'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/ty.txt
+sed -i "/#_0/r /usr/local/x-ui/bin/clvmtargoym.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vm-tls-argo固定-8443" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_0/r /usr/local/x-ui/bin/clvmargoym.log" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_1/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_2/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/#_3/ i\\    - vm-argo固定-8880" /usr/local/x-ui/bin/clmi.yaml
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmtargoym.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vm-tls-argo固定-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vm-tls-argo固定-8443\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_0/r /usr/local/x-ui/bin/sbvmargoym.log" /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_1/ i\\ \"vm-argo固定-8880\"," /usr/local/x-ui/bin/sbox.json
+sed -i "/\/\/_2/ i\\ \"vm-argo固定-8880\"," /usr/local/x-ui/bin/sbox.json
+echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argoym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8880","ps":"vm-argo固定-8880","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
+echo -e "vmess://$(echo '{"add":"'$cdnargo'","aid":"0","host":"'$argoym'","id":"'$uuid'","net":"ws","path":"'$ws_path'","port":"8443","ps":"vm-tls-argo固定-8443","tls":"tls","sni":"'$argoym'","type":"none","v":"2"}' | base64 -w 0)" >>/usr/local/x-ui/bin/jhsub.txt
 fi
 fi
-line=$(grep -B1 "//_1" /usr/local/x-ui/bin/xui_singbox.json | grep -v "//_1")
+line=$(grep -B1 "//_1" /usr/local/x-ui/bin/sbox.json | grep -v "//_1")
 new_line=$(echo "$line" | sed 's/,//g')
-sed -i "/^$line$/s/.*/$new_line/g" /usr/local/x-ui/bin/xui_singbox.json
-sed -i '/\/\/_0\|\/\/_1\|\/\/_2/d' /usr/local/x-ui/bin/xui_singbox.json
-sed -i '/#_0\|#_1\|#_2\|#_3/d' /usr/local/x-ui/bin/xui_clashmeta.yaml
+sed -i "/^$line$/s/.*/$new_line/g" /usr/local/x-ui/bin/sbox.json
+sed -i '/\/\/_0\|\/\/_1\|\/\/_2/d' /usr/local/x-ui/bin/sbox.json
+sed -i '/#_0\|#_1\|#_2\|#_3/d' /usr/local/x-ui/bin/clmi.yaml
 find /usr/local/x-ui/bin -type f -name "*.log" -delete
-baseurl=$(base64 -w 0 < /usr/local/x-ui/bin/ty.txt 2>/dev/null)
-v2sub=$(cat /usr/local/x-ui/bin/ty.txt 2>/dev/null)
-echo "$v2sub" > /usr/local/x-ui/bin/xui_ty.txt
+baseurl=$(base64 -w 0 < /usr/local/x-ui/bin/jhsub.txt 2>/dev/null)
+v2sub=$(cat /usr/local/x-ui/bin/jhsub.txt 2>/dev/null)
+echo "$v2sub" > /usr/local/x-ui/bin/jhsub.txt
 }
 
 insxuiwpph(){
@@ -2510,7 +2692,7 @@ red "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 green " 1. 一键安装 x-ui"
 green " 2. 删除卸载 x-ui"
 echo "----------------------------------------------------------------------------------"
-green " 3. 其他设置 【Argo双隧道、订阅优选IP、Gitlab订阅链接、获取warp-wireguard账号配置】"
+green " 3. 其他设置 【Argo固定临时隧道、生成本地IP订阅链接、设置hy2协议多端口跳跃】"
 green " 4. 变更 x-ui 面板设置 【用户名密码、登录端口、根路径、还原面板】"
 green " 5. 关闭、重启 x-ui"
 green " 6. 更新 x-ui 脚本"
@@ -2688,6 +2870,20 @@ xpath=$(echo $acp | awk '{print $8}')
 xport=$(echo $acp | awk '{print $6}')
 xip1=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 1p)
 xip2=$(cat /usr/local/x-ui/xip 2>/dev/null | sed -n 2p)
+temp=$(systemctl is-active x-ui 2>/dev/null | grep -w active)
+if [[ x"${temp}" == x"active" ]]; then
+if [ -s /usr/local/x-ui/subport.log ]; then
+showsubport=$(cat /usr/local/x-ui/subport.log)
+if ps -ef 2>/dev/null | grep "$showsubport" | grep -v grep >/dev/null; then
+showsubtoken=$(cat /usr/local/x-ui/subtoken.log 2>/dev/null)
+suburl="$xip1:$showsubport/$showsubtoken"
+echo "Clash/Mihomo本地IP订阅地址：http://$suburl/clmi.yaml"
+echo "Sing-box本地IP订阅地址：http://$suburl/sbox.json"
+echo "聚合协议本地IP订阅地址：http://$suburl/jhsub.txt"
+echo "------------------------------------------------------------------------------------"
+fi
+fi
+fi
 if [ "$xpath" == "/" ]; then
 pathk="$sred【严重安全提示: 请进入面板设置，添加url根路径】$plain"
 fi
@@ -2704,7 +2900,7 @@ ym=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
 echo $ym > /root/ygkkkca/ca.log
 fi
 if [[ -f /root/ygkkkca/ca.log ]]; then
-echo -e "$blue登录地址(域名加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
+echo -e "$blue登录地址(域名或IP加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
 else
 echo -e "$sred强烈建议申请域名证书并开启域名(https)登录方式，以确保面板数据安全$plain"
 fi
