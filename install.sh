@@ -402,7 +402,12 @@ uncronxui
 iptables -t nat -F PREROUTING >/dev/null 2>&1
 ip6tables -t nat -F PREROUTING >/dev/null 2>&1
 netfilter-persistent save >/dev/null 2>&1
-service iptables save >/dev/null 2>&1
+if command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1; then
+rc-update show default 2>/dev/null | grep -q 'iptables' || rc-update add iptables >/dev/null 2>&1
+rc-update show default 2>/dev/null | grep -q 'ip6tables' || rc-update add ip6tables >/dev/null 2>&1
+rc-service iptables save >/dev/null 2>&1
+rc-service ip6tables save >/dev/null 2>&1
+fi
 #sed -i '/^precedence ::ffff:0:0\/96  100/d' /etc/gai.conf 2>/dev/null
 echo
 green "x-ui已卸载完成"
