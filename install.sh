@@ -742,7 +742,7 @@ fi
 
 hyjpport(){
 readp "指定已设置的Hysteria2协议的主端口：" hyport
-readp "设置该主端口转发的跳跃端口【格式：20000-50000,12345】：" hyjpt
+readp "设置该主端口转发的跳跃端口【格式：10000-10005,12345】：" hyjpt
 while read -r rule; do
 iptables -t nat ${rule/-A/-D}
 done < <(iptables -t nat -S PREROUTING | grep "DNAT.*to-destination :$hyport$")
