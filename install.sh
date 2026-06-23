@@ -2913,7 +2913,7 @@ fi
 if [[ -f /root/ygkkkca/ca.log ]]; then
 echo -e "$blue登录地址(域名或IP加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
 else
-echo -e "$sred强烈建议申请域名证书并开启域名(https)登录方式，以确保面板数据安全$plain"
+echo -e "$sred强烈建议申请IP或域名证书并开启域名(https)登录方式，以确保面板数据安全$plain"
 fi
 fi
 else
