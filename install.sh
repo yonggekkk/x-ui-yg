@@ -402,7 +402,12 @@ uncronxui
 iptables -t nat -F PREROUTING >/dev/null 2>&1
 ip6tables -t nat -F PREROUTING >/dev/null 2>&1
 netfilter-persistent save >/dev/null 2>&1
-service iptables save >/dev/null 2>&1
+if command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1; then
+rc-update show default 2>/dev/null | grep -q 'iptables' || rc-update add iptables >/dev/null 2>&1
+rc-update show default 2>/dev/null | grep -q 'ip6tables' || rc-update add ip6tables >/dev/null 2>&1
+rc-service iptables save >/dev/null 2>&1
+rc-service ip6tables save >/dev/null 2>&1
+fi
 #sed -i '/^precedence ::ffff:0:0\/96  100/d' /etc/gai.conf 2>/dev/null
 echo
 green "x-ui已卸载完成"
@@ -737,7 +742,13 @@ fi
 
 hyjpport(){
 readp "指定已设置的Hysteria2协议的主端口：" hyport
-readp "设置该主端口转发的跳跃端口【格式：20000-50000,12345】：" hyjpt
+readp "设置该主端口转发的跳跃端口【格式：10000-10005,12345】：" hyjpt
+while read -r rule; do
+iptables -t nat ${rule/-A/-D}
+done < <(iptables -t nat -S PREROUTING | grep "DNAT.*to-destination :$hyport$")
+while read -r rule; do
+ip6tables -t nat ${rule/-A/-D}
+done < <(ip6tables -t nat -S PREROUTING | grep "DNAT.*to-destination :$hyport$")
 for p in ${hyjpt//,/ }; do
 iptables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || iptables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
 ip6tables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || ip6tables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
@@ -2902,7 +2913,7 @@ fi
 if [[ -f /root/ygkkkca/ca.log ]]; then
 echo -e "$blue登录地址(域名或IP加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
 else
-echo -e "$sred强烈建议申请域名证书并开启域名(https)登录方式，以确保面板数据安全$plain"
+echo -e "$sred强烈建议申请IP或域名证书并开启域名(https)登录方式，以确保面板数据安全$plain"
 fi
 fi
 else
