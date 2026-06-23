@@ -738,9 +738,13 @@ fi
 hyjpport(){
 readp "指定已设置的Hysteria2协议的主端口：" hyport
 readp "设置该主端口转发的跳跃端口【格式：20000-50000,12345】：" hyjpt
+for cmd in iptables ip6tables; do
+while read -r rule; do
+$cmd -t nat ${rule/-A/-D}
+done < <($cmd -t nat -S PREROUTING | grep "to-destination :$hyport$")
 for p in ${hyjpt//,/ }; do
-iptables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || iptables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
-ip6tables -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || ip6tables -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
+$cmd -t nat -C PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport 2>/dev/null || $cmd -t nat -A PREROUTING -p udp --dport "${p//-/:}" -j DNAT --to-destination :$hyport
+done
 done
 netfilter-persistent save >/dev/null 2>&1
 if command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1; then
