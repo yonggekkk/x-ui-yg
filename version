@@ -1,6 +1,6 @@
 v26.6.18更新内容：
 更新日志：
 1：支持hy2协议、端口跳跃
-2、支持本地IP订阅链接(XUI界面的指定节点的添加、变更、删除自动同步订阅)
+2、支持本地IP订阅链接(XUI面版指定节点的添加、变更、删除将自动同步IP订阅链接)
 重置配置文件？已备份在https://github.com/yonggekkk/x-ui-yg/blob/main/config.json
 博客教程详见：https://www.youtube.com/playlist?list=PLMgly2AulGG_NwrnmcNSxXdsB4EDJ-Q4W
