@@ -38,6 +38,8 @@
 
 [x-ui搭建xray协议大更新（六）：Xhttp轻松搞定UDP/TCP/CDN，Xhttp最简单的7个方案，总有一款适合你](https://youtu.be/kY_4AyQh1l0)
 
+[x-ui-yg面版脚本大更新（七）：支持Hy2协议，自签证书与IP证书设置要点；多端口跳跃设置；本地IP订阅链接自动更新配置](https://youtu.be/8AI_fFwHMJE)
+
 -----------------------------------------------------
 ### 交流平台：[甬哥博客地址](https://ygkkk.blogspot.com)、[甬哥YouTube频道](https://www.youtube.com/@ygkkk)、[甬哥TG电报群组](https://t.me/+jZHc6-A-1QQ5ZGVl)、[甬哥TG电报频道](https://t.me/+DkC9ZZUgEFQzMTZl)
 
