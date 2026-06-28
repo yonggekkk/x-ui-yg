@@ -1561,6 +1561,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
 
 EOF
 echo "hysteria2://$uuid@$servip:$hy2_port?security=tls&alpn=h3&insecure=0&allowInsecure=0$hyps&sni=$hy2_name&pinSHA256=$SHA256#$tag" >>/usr/local/x-ui/bin/jhsub.txt
+unset SHA256
 xui_sb_cl
 
 #vless-reality-vision
