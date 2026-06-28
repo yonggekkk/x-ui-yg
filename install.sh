@@ -1156,10 +1156,6 @@ echo
 }
 
 sharesub(){
-if [ -s "/root/ygkkkca/ca.log" ]; then
-ym=`bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | tail -1`
-echo $ym > /root/ygkkkca/ca.log
-fi
 sharesub_sbcl
 echo
 red "Gitlab订阅链接如下："
@@ -2910,10 +2906,6 @@ else
 xuimb="http://${xip1}:${xport}${xpath}"
 fi
 echo -e "$blue登录地址(裸IP泄露模式-非安全)：$xuimb$plain"
-if [[ -f /root/ygkkkca/cert.crt && -f /root/ygkkkca/private.key && -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
-ym=`bash ~/.acme.sh/acme.sh --list | awk 'NR>1{print $1}' | tail -1`
-echo $ym > /root/ygkkkca/ca.log
-fi
 if [[ -f /root/ygkkkca/ca.log ]]; then
 echo -e "$blue登录地址(域名或IP加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
 else
