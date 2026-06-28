@@ -1156,6 +1156,10 @@ echo
 }
 
 sharesub(){
+if [ -s "/root/ygkkkca/ca.log" ]; then
+ym=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
+echo $ym > /root/ygkkkca/ca.log
+fi
 sharesub_sbcl
 echo
 red "Gitlab订阅链接如下："
@@ -1204,10 +1208,6 @@ echo
 }
 
 sharesub_sbcl(){
-if [ -s "/root/ygkkkca/ca.log" ]; then
-ym=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
-echo $ym > /root/ygkkkca/ca.log
-fi
 if [[ -s /usr/local/x-ui/bin/xuicdnip_argo.txt ]]; then
 cdnargo=$(cat /usr/local/x-ui/bin/xuicdnip_argo.txt 2>/dev/null)
 else
