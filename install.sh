@@ -789,6 +789,9 @@ echo $subport > /usr/local/x-ui/subport.log
 green "订阅链接端口：$(cat /usr/local/x-ui/subport.log 2>/dev/null)"
 }
 echo
+green "注意：目前订阅仅支持生成HY2、vmess的argo固定临时、vmess/vless/trojan+ws/tcp+(tls)、SS、vless-tcp-reality的配置"
+yellow "其他传输协议及ECN等加密目前不支持"
+echo
 yellow "1：重置安装本地IP订阅链接"
 yellow "2：更换订阅链接路径密码"
 yellow "3：更换订阅链接端口"
