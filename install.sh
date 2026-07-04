@@ -1470,6 +1470,7 @@ proxy-groups:
 
 rules:
   - GEOIP,LAN,DIRECT
+  - GEOSITE,CN,DIRECT
   - GEOIP,CN,DIRECT
   - MATCH,🌍选择代理节点
 EOF
