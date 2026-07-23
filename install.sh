@@ -789,6 +789,9 @@ echo $subport > /usr/local/x-ui/subport.log
 green "订阅链接端口：$(cat /usr/local/x-ui/subport.log 2>/dev/null)"
 }
 echo
+green "注意：目前订阅仅支持生成HY2、vmess的argo固定临时、vmess/vless/trojan+ws/tcp+(tls)、SS、vless-tcp-reality的配置"
+yellow "其他传输协议及ECN等加密目前不支持"
+echo
 yellow "1：重置安装本地IP订阅链接"
 yellow "2：更换订阅链接路径密码"
 yellow "3：更换订阅链接端口"
@@ -1283,6 +1286,11 @@ cat > /usr/local/x-ui/bin/sbox.json <<EOF
         "final": "proxyDns",
         "strategy": "prefer_ipv4"
     },
+	  "http_clients": [
+    {
+      "tag": "http-client-direct"
+    }
+    ],
     "inbounds": [
         {
             "type": "tun",
@@ -1343,18 +1351,17 @@ cat > /usr/local/x-ui/bin/sbox.json <<EOF
                 "tag": "geosite-cn",
                 "type": "remote",
                 "format": "binary",
-                "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-cn.srs",
-                "download_detour": "direct"
+                "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-cn.srs"
             },
             {
                 "tag": "geoip-cn",
                 "type": "remote",
                 "format": "binary",
-                "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
-                "download_detour": "direct"
+                "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs"
             }
         ],
         "final": "proxy",
+        "default_http_client": "http-client-direct",
         "auto_detect_interface": true,
         "default_domain_resolver": {
             "server": "aliDns"
@@ -1467,6 +1474,7 @@ proxy-groups:
 
 rules:
   - GEOIP,LAN,DIRECT
+  - GEOSITE,CN,DIRECT
   - GEOIP,CN,DIRECT
   - MATCH,🌍选择代理节点
 EOF
@@ -1561,6 +1569,7 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
 
 EOF
 echo "hysteria2://$uuid@$servip:$hy2_port?security=tls&alpn=h3&insecure=0&allowInsecure=0$hyps&sni=$hy2_name&pinSHA256=$SHA256#$tag" >>/usr/local/x-ui/bin/jhsub.txt
+unset SHA256
 xui_sb_cl
 
 #vless-reality-vision
@@ -2906,10 +2915,6 @@ else
 xuimb="http://${xip1}:${xport}${xpath}"
 fi
 echo -e "$blue登录地址(裸IP泄露模式-非安全)：$xuimb$plain"
-if [[ -f /root/ygkkkca/cert.crt && -f /root/ygkkkca/private.key && -s /root/ygkkkca/cert.crt && -s /root/ygkkkca/private.key ]]; then
-ym=`bash ~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}'`
-echo $ym > /root/ygkkkca/ca.log
-fi
 if [[ -f /root/ygkkkca/ca.log ]]; then
 echo -e "$blue登录地址(域名或IP加密模式-安全)：https://$(cat /root/ygkkkca/ca.log 2>/dev/null):${xport}${xpath}$plain"
 else
