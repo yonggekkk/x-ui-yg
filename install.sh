@@ -1712,7 +1712,6 @@ cat > /usr/local/x-ui/bin/sb${i}.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
@@ -1792,7 +1791,6 @@ cat > /usr/local/x-ui/bin/sb${i}.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
@@ -1858,7 +1856,6 @@ cat > /usr/local/x-ui/bin/sb${i}.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "type": "vmess",
             "security": "auto",
             "uuid": "$uuid"
@@ -1909,7 +1906,6 @@ cat > /usr/local/x-ui/bin/sb${i}.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "type": "vless",
             "uuid": "$uuid"
         },
@@ -2081,7 +2077,6 @@ cat > /usr/local/x-ui/bin/sbvltargo.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
@@ -2130,7 +2125,6 @@ cat > /usr/local/x-ui/bin/sbvlargo.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
@@ -2196,7 +2190,6 @@ cat > /usr/local/x-ui/bin/sbvmtargo.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
@@ -2248,7 +2241,6 @@ cat > /usr/local/x-ui/bin/sbvmargo.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
@@ -2325,7 +2317,6 @@ cat > /usr/local/x-ui/bin/sbvltargoym.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
@@ -2374,7 +2365,6 @@ cat > /usr/local/x-ui/bin/sbvlargoym.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
@@ -2440,7 +2430,6 @@ cat > /usr/local/x-ui/bin/sbvmtargoym.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
@@ -2492,7 +2481,6 @@ cat > /usr/local/x-ui/bin/sbvmargoym.log <<EOF
                     "fingerprint": "chrome"
                 }
             },
-            "packet_encoding": "packetaddr",
             "transport": {
                 "headers": {
                     "Host": [
