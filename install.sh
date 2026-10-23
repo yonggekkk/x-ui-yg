@@ -907,6 +907,7 @@ curl -L -o /usr/local/x-ui/cloudflared -# --retry 2 https://github.com/cloudflar
 #curl -L -o /usr/local/x-ui/cloudflared -# --retry 2 https://gitlab.com/rwkgyg/sing-box-yg/-/raw/main/$cpu
 chmod +x /usr/local/x-ui/cloudflared
 fi
+green "Argo版本：V$(/usr/local/x-ui/cloudflared version 2>/dev/null | awk '{print $3}')"
 }
 
 xuiargo(){
@@ -971,7 +972,7 @@ rm /tmp/crontab.tmp
 sharesub_sbcl >/dev/null 2>&1
 elif [ "$menu" = "2" ]; then
 kill -15 $(cat /usr/local/x-ui/xuiargopid.log 2>/dev/null) >/dev/null 2>&1
-rm -rf /usr/local/x-ui/argo.log /usr/local/x-ui/xuiargopid.log /usr/local/x-ui/xuiargoport.log
+rm -rf /usr/local/x-ui/argo.log /usr/local/x-ui/xuiargopid.log /usr/local/x-ui/xuiargoport.log /usr/local/x-ui/cloudflared
 crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiargopid.log/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
@@ -1021,7 +1022,7 @@ blue "Argo固定隧道设置完成，固定域名：$argo"
 sharesub_sbcl >/dev/null 2>&1
 elif [ "$menu" = "2" ]; then
 kill -15 $(cat /usr/local/x-ui/xuiargoympid.log 2>/dev/null) >/dev/null 2>&1
-rm -rf /usr/local/x-ui/xuiargoym.log /usr/local/x-ui/xuiargoymport.log /usr/local/x-ui/xuiargoympid.log /usr/local/x-ui/xuiargotoken.log
+rm -rf /usr/local/x-ui/xuiargoym.log /usr/local/x-ui/xuiargoymport.log /usr/local/x-ui/xuiargoympid.log /usr/local/x-ui/xuiargotoken.log /usr/local/x-ui/cloudflared
 crontab -l 2>/dev/null > /tmp/crontab.tmp
 sed -i '/xuiargoympid/d' /tmp/crontab.tmp
 crontab /tmp/crontab.tmp >/dev/null 2>&1
