@@ -1620,7 +1620,8 @@ cat > /usr/local/x-ui/bin/cl${i}.log <<EOF
   servername: $vl_name                 
   reality-opts: 
     public-key: $public_key    
-    short-id: $short_id                      
+    short-id: $short_id
+    support-x25519mlkem768: true
   client-fingerprint: $finger   
 
 EOF
