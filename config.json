@@ -74,8 +74,10 @@
 "settings":{
 "domainStrategy":"UseIPv4v6"
 },
-"proxySettings":{
-"tag":"socks5-warp"
+"streamSettings": {
+"sockopt": {
+"dialerProxy":"socks5-warp"
+}
 }
 },
 {
@@ -84,8 +86,10 @@
 "settings":{
 "domainStrategy":"UseIPv6v4"
 },
-"proxySettings":{
-"tag":"socks5-warp"
+"streamSettings": {
+"sockopt": {
+"dialerProxy":"socks5-warp"
+}
 }
 },
 {
@@ -116,8 +120,10 @@
 "settings":{
 "domainStrategy":"UseIPv4v6"
 },
-"proxySettings":{
-"tag":"xray-wg-warp"
+"streamSettings": {
+"sockopt": {
+"dialerProxy":"xray-wg-warp"
+}
 }
 },
 {
@@ -126,8 +132,10 @@
 "settings":{
 "domainStrategy":"UseIPv6v4"
 },
-"proxySettings":{
-"tag":"xray-wg-warp"
+"streamSettings": {
+"sockopt": {
+"dialerProxy":"xray-wg-warp"
+}
 }
 }
 ],
@@ -200,7 +208,7 @@
 "type": "field",
 "outboundTag":"vps-outbound-v4",
 "domain": [
-"api.myip.com","yg-kkk.com"
+"ip.gs","yg-kkk.com"
 ]
 },
 {
