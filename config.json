@@ -1,35 +1,35 @@
 {
 "api": {
-    "services": [
-      "HandlerService",
-      "LoggerService",
-      "StatsService"
-    ],
-    "tag": "api"
-  },
-  "inbounds": [
-    {
-      "listen": "127.0.0.1",
-      "port": 62789,
-      "protocol": "dokodemo-door",
-      "settings": {
-        "address": "127.0.0.1"
-      },
-      "tag": "api"
-    }
-  ],  
- "policy": {
-    "system": {
-      "statsInboundDownlink": true,
-      "statsInboundUplink": true
-    },
-     "levels": {
-      "0": {
-        "statsUserDownlink": true,
-        "statsUserUplink": true
-      }
-    }
-  },
+"services": [
+"HandlerService",
+"LoggerService",
+"StatsService"
+],
+"tag": "api"
+},
+"inbounds": [
+{
+"listen": "127.0.0.1",
+"port": 62789,
+"protocol": "dokodemo-door",
+"settings": {
+"address": "127.0.0.1"
+},
+"tag": "api"
+}
+],
+"policy": {
+"system": {
+"statsInboundDownlink": true,
+"statsInboundUplink": true
+},
+"levels": {
+"0": {
+"statsUserDownlink": true,
+"statsUserUplink": true
+}
+}
+},
 "outbounds": [
 {
 "protocol": "blackhole",
@@ -38,22 +38,28 @@
 {
 "tag": "direct",
 "protocol": "freedom",
-"settings": {
-"domainStrategy":"UseIP"
+"streamSettings": {
+"sockopt": {
+"domainStrategy": "UseIP"
+}
 }
 },
 {
-"tag": "vps-outbound-v4", 
+"tag": "vps-outbound-v4",
 "protocol": "freedom",
-"settings": {
-"domainStrategy":"UseIPv4v6"
+"streamSettings": {
+"sockopt": {
+"domainStrategy": "UseIPv4v6"
+}
 }
 },
 {
 "tag": "vps-outbound-v6",
 "protocol": "freedom",
-"settings": {
-"domainStrategy":"UseIPv6v4"
+"streamSettings": {
+"sockopt": {
+"domainStrategy": "UseIPv6v4"
+}
 }
 },
 {
@@ -63,19 +69,17 @@
 "servers": [
 {
 "address": "127.0.0.1",
-"port": 40000 
+"port": 40000
 }
 ]
-}      
+}
 },
 {
 "tag":"socks5-warp-v4",
 "protocol":"freedom",
-"settings":{
-"domainStrategy":"UseIPv4v6"
-},
 "streamSettings": {
 "sockopt": {
+"domainStrategy":"UseIPv4v6",
 "dialerProxy":"socks5-warp"
 }
 }
@@ -83,11 +87,9 @@
 {
 "tag":"socks5-warp-v6",
 "protocol":"freedom",
-"settings":{
-"domainStrategy":"UseIPv6v4"
-},
 "streamSettings": {
 "sockopt": {
+"domainStrategy":"UseIPv6v4",
 "dialerProxy":"socks5-warp"
 }
 }
@@ -117,11 +119,9 @@
 {
 "tag":"xray-wg-warp-v4",
 "protocol":"freedom",
-"settings":{
-"domainStrategy":"UseIPv4v6"
-},
 "streamSettings": {
 "sockopt": {
+"domainStrategy":"UseIPv4v6",
 "dialerProxy":"xray-wg-warp"
 }
 }
@@ -129,11 +129,9 @@
 {
 "tag":"xray-wg-warp-v6",
 "protocol":"freedom",
-"settings":{
-"domainStrategy":"UseIPv6v4"
-},
 "streamSettings": {
 "sockopt": {
+"domainStrategy":"UseIPv6v4",
 "dialerProxy":"xray-wg-warp"
 }
 }
@@ -143,39 +141,39 @@
 "domainStrategy": "AsIs",
 "rules": [
 {
-        "inboundTag": [
-          "api"
-        ],
-        "outboundTag": "api",
-        "type": "field"
-      },
-    {
-          "type": "field",
-          "port": "443",
-          "network": "udp",
-          "outboundTag": "blocked"
-            },
-       {
-        "type": "field",
-        "domain": [
-          "www.gstatic.com"
-        ],
-        "outboundTag": "direct"
-      },
-      {
-        "ip": [
-          "geoip:cn"
-        ],
-        "outboundTag": "blocked",
-        "type": "field"
-      },
-      {
-        "outboundTag": "blocked",
-        "protocol": [
-          "bittorrent"
-        ],
-        "type": "field"
-      },
+"inboundTag": [
+"api"
+],
+"outboundTag": "api",
+"type": "field"
+},
+{
+"type": "field",
+"port": "443",
+"network": "udp",
+"outboundTag": "blocked"
+},
+{
+"type": "field",
+"domain": [
+"www.gstatic.com"
+],
+"outboundTag": "direct"
+},
+{
+"ip": [
+"geoip:cn"
+],
+"outboundTag": "blocked",
+"type": "field"
+},
+{
+"outboundTag": "blocked",
+"protocol": [
+"bittorrent"
+],
+"type": "field"
+},
 {
 "type":"field",
 "outboundTag":"xray-wg-warp-v4",
